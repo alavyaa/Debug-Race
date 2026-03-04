@@ -13,7 +13,7 @@ app.use(cookieParser());
 
 // routes
 app.use("/api/auth", require("./routes/auth.route"));
-app.use("/api/team", require("./routes/team"));
+app.use("/api/lobby", require("./routes/lobby.route"));
 app.use("/api/race", require("./routes/race"));
 app.use("/api/ai", require("./routes/ai"));
 
