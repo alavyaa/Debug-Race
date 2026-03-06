@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://debug-race-production.up.railway.app/api"; // Change this to your backend URL
+const API_URL = "debug-race-production-b38c.up.railway.app"; // Change this to your backend URL
 
 const api = axios.create({
   baseURL: API_URL,
