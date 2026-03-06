@@ -1,18 +1,18 @@
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/User.model");
 const bcrypt = require("bcrypt");
+
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
 
-// @desc    Register user
-// @route   POST /api/auth/register
+// Register
 async function registerController(req, res) {
   try {
     const { username, email, password } = req.body;
 
-    const userExists = await userModel.findOne( {username} , { email });
+    const userExists = await userModel.findOne({ username }, { email });
     if (userExists) {
       return res.status(400).json({ error: "User already exists" });
     }
@@ -36,6 +36,7 @@ async function registerController(req, res) {
 
     res.status(201).json({
       message: "Registered successfully!",
+      token, // 🔥 ADDED
       user: {
         _id: user._id,
         username: user.username,
@@ -48,33 +49,44 @@ async function registerController(req, res) {
   }
 }
 
-// @desc    Login user
-// @route   POST /api/auth/login
+// Login
 async function loginController(req, res) {
   try {
     const { email, password } = req.body;
+
     const user = await userModel.findOne({ email });
+
     if (!user) {
       return res.status(402).json({ message: "User Not Exists!" });
     }
+
     const validPassword = await bcrypt.compare(password, user.password);
+
     if (!validPassword) {
       return res.status(201).json({ message: "Invalid Credentials!" });
     }
+
     const token = generateToken(user._id);
+
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000,
     });
-    res.status(200).json({ message: "Logged in Successfully!", user });
+
+    res.status(200).json({
+      message: "Logged in Successfully!",
+      user,
+      token // 🔥 ADDED
+    });
+
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 }
-// @desc    Login user
-// @route   POST /api/auth/logout
+
+// Logout
 async function logOutController(req,res){
   try {
     res.cookie("token", "", { maxAge: 0, httpOnly: true }); 
@@ -84,8 +96,7 @@ async function logOutController(req,res){
   }
 }
 
-// // @desc    Get user profile
-// // @route   GET /api/auth/profile
+// Profile
 async function getProfileController(req, res) {
   try {
     const user = await userModel.findById(req.user._id).select("-password");
