@@ -25,6 +25,7 @@
   "homepage": "https://github.com/Hamzaul/Debug-Race#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7"
+    "cookie-parser": "^1.4.7",
+    "framer-motion": "^12.35.0"
   }
 }
