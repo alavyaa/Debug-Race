@@ -259,7 +259,7 @@ Weak topics detection:
 
 [Hamzaul Rahman](https://github.com/Hamzaul)
 [Alavya Bajpai](https://github.com/alavyaa)
-[Adi Baria](https://github.com/ADiBariya)
+[Adi Bariya](https://github.com/ADiBariya)
 [Vishwas Panwar](https://github.com/vishwas-panwar)
 
 ## 🚀 Future Improvements
@@ -279,3 +279,9 @@ Weak topics detection:
 ## ⭐ Support
 
 If you like this project, please consider giving it a ⭐ on GitHub!
+
+## 🚀 One Click Deploy
+
+Deploy instantly on Railway.
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/new?template=https://github.com/Hamzaul/Debug-Race)
