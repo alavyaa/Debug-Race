@@ -43,6 +43,16 @@ const AppRoutes = () => {
         }
       />
 
+      {/* ADD THIS */}
+      <Route
+        path="/race/:raceId"
+        element={
+          <ProtectedRoute>
+            <RoomPage />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/profile"
         element={
