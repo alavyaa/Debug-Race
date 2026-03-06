@@ -6,7 +6,10 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use(cors({
-  origin: true,
+  origin: [
+    "https://debug-race-s8w9.vercel.app",
+    "http://localhost:5173"
+  ],
   credentials: true
 }));
 
