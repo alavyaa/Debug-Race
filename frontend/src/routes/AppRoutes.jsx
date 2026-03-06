@@ -49,10 +49,10 @@ const AppRoutes = () => {
         path="/race/:raceId"
         element={
           <ProtectedRoute>
-            <RoomPage />
+            <RacePage />
           </ProtectedRoute>
-        }
-      />
+       }
+    />
       
       <Route
         path="/profile"
