@@ -12,7 +12,7 @@ async function registerController(req, res) {
   try {
     const { username, email, password } = req.body;
 
-    const userExists = await userModel.findOne({ email });
+    const userExists = await userModel.findOne( {username} , { email });
     if (userExists) {
       return res.status(400).json({ error: "User already exists" });
     }
