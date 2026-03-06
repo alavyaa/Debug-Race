@@ -7,7 +7,7 @@ import RoomPage from "../pages/Roompage";
 import { useAuth } from "../features/auth/features.authContext";
 import ProtectedRoute from "./ProtectedRoute";
 import Loader from "../pages/LoaderPage";
-import RacePage from "../pages/RacePage";
+import RacePage from "../Race/RacePage";
 
 const AppRoutes = () => {
   const { user } = useAuth();
