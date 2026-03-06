@@ -3,7 +3,7 @@ import axios from "axios";
 const API_URL = "debug-race-production-b38c.up.railway.app"; // Change this to your backend URL
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL + "/api",,
+  baseURL: "https://debug-race-production-b38c.up.railway.app/api",
   timeout: 10000,
   withCredentials: true,
   headers: {
