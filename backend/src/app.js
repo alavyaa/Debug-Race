@@ -16,22 +16,28 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+/* HEALTH CHECK ROUTE (important for Railway) */
+app.get("/", (req, res) => {
+  res.send("Debug Race backend running 🚀");
+});
+
 // routes
 app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/lobby", require("./routes/lobby.route"));
 app.use("/api/race", require("./routes/race"));
 app.use("/api/ai", require("./routes/ai"));
 
-// 404 handler
+/* 404 handler */
 app.use((req, res) => {
   res.status(404).json({
     error: `Cannot ${req.method} ${req.path}`
   });
 });
 
-module.exports = app;
-
+/* GLOBAL ERROR HANDLER */
 app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: "Server error" });
+  console.error("Server error:", err);
+  res.status(500).json({ error: err.message });
 });
+
+module.exports = app;
