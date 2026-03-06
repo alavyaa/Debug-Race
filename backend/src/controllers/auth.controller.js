@@ -12,30 +12,39 @@ async function registerController(req, res) {
   try {
     const { username, email, password } = req.body;
 
-    // Check if user exists
-    const userExists = await userModel.findOne({
-      $or: [{ email }, { username }],
-    });
+    const userExists = await userModel.findOne({ email });
     if (userExists) {
       return res.status(400).json({ error: "User already exists" });
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
     const user = await userModel.create({
-      username: username,
-      email: email,
+      username,
+      email,
       password: hashedPassword,
     });
-    const token = res.cookie("token", generateToken(user._id), {
+
+    const token = generateToken(user._id);
+
+    res.cookie("token", token, {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000,
     });
-    res.status(201).json({ message: "Registered successfully!", user });
+
+    res.status(201).json({
+      message: "Registered successfully!",
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email
+      }
+    });
+
   } catch (error) {
-    return res.status(500).json({ error: error.message }, error);
+    res.status(500).json({ error: error.message });
   }
 }
 

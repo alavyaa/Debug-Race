@@ -1,4 +1,4 @@
-import { api } from "../../services/api.service";
+import api from "../../services/api.service";
 import Cookies from 'js-cookie';
 
 export const registerUser = (data) =>

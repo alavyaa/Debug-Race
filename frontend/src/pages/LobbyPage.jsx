@@ -1,20 +1,42 @@
 import { useAuth } from "../features/auth/features.authContext";
+import api from "../services/api.service";
 import { useNavigate } from "react-router-dom";
 import "../styles/lobby.css";
+
 
 const Lobby = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleCreate = () => {
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-    navigate(`/room/${code}`);
-  };
+  const handleCreate = async () => {
+  try {
+    const res = await api.post("/lobby", {
+      name: "Debug Race"
+    });
 
-  const handleJoin = () => {
-    const code = prompt("Enter Room Code");
-    if (code) navigate(`/room/${code.toUpperCase()}`);
-  };
+    const code = res.data.lobby.code;
+
+    navigate(`/room/${code}`);
+
+  } catch (error) {
+    console.error("Failed to create lobby", error);
+  }
+};
+
+  const handleJoin = async () => {
+  const code = prompt("Enter Room Code");
+
+  if (!code) return;
+
+  try {
+    await api.post("/lobby/join", { code });
+
+    navigate(`/room/${code.toUpperCase()}`);
+
+  } catch (err) {
+    alert("Lobby not found");
+  }
+};
 
   const handleLogout = async () => {
     await logout();

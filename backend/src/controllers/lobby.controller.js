@@ -3,18 +3,20 @@ const raceModel = require("../models/race.model");
 
 async function createLobbyController(req, res) {
   try {
-    const { name, settings } = req.body;
+    const { name, settings = {} } = req.body;
     const user = req.user;
 
     const lobby = await lobbyModel.create({
-      name,
+      name: name || "Debug Race Lobby",
       leader: user._id,
       code: await lobbyModel.generateCode(),
+
       settings: {
-        language: settings.language,
-        level: settings.level,
-        maxPlayers: settings.maxPlayers,
+        language: settings.language || "JavaScript",
+        level: settings.level || 1,
+        maxPlayers: settings.maxPlayers || 4,
       },
+
       members: [
         {
           user: user._id,
@@ -23,6 +25,7 @@ async function createLobbyController(req, res) {
           isReady: false,
         },
       ],
+
       status: "waiting",
       currentRace: null,
     });
@@ -31,6 +34,7 @@ async function createLobbyController(req, res) {
       message: "Lobby Created successfully!",
       lobby,
     });
+
   } catch (error) {
     res.status(400).json({
       message: error.message,
