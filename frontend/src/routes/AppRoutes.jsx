@@ -3,7 +3,7 @@ import Login from "../pages/Login";
 import Register from "../pages/RegisterPage";
 import Lobby from "../pages/LobbyPage";
 import Profile from "../pages/profilePage";
-import RoomPage from "../pages/RoomPage";
+import RoomPage from "../pages/Roompage";
 import { useAuth } from "../features/auth/features.authContext";
 import ProtectedRoute from "./ProtectedRoute";
 import Loader from "../pages/LoaderPage";
