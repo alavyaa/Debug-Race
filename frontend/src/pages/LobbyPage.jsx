@@ -74,9 +74,6 @@ const Lobby = () => {
             🔑 JOIN LOBBY
           </button>
 
-          <button className="neutral-action">🏆 LEADERBOARD</button>
-
-          <button className="neutral-action">📊 STATS</button>
         </div>
       </div>
     </div>
