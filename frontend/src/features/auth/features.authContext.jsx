@@ -39,17 +39,27 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (data) => {
-    await loginUser(data);
+    const res = await loginUser(data);
+
+    // SAVE TOKEN (added)
+    if (res?.data?.token) {
+      localStorage.setItem("debugrace_token", res.data.token);
+    }
+
     await fetchUser();
   };
 
   const logout = async () => {
     await logoutUser();
+
+    // REMOVE TOKEN (added)
+    localStorage.removeItem("debugrace_token");
+
     setUser(null);
   };
 
   const profile = async()=>{
-    await getCurrentUser(data);
+    await getCurrentUser();   // fixed small bug (removed undefined data)
     await fetchUser();
   }
 
