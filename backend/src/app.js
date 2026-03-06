@@ -7,8 +7,8 @@ const app = express();
 
 app.use(cors({
   origin: [
-    "https://debug-race-s8w9.vercel.app",
-    "http://localhost:5173"
+    "http://localhost:5173",
+    /https:\/\/debug-race.*\.vercel\.app/
   ],
   credentials: true
 }));
