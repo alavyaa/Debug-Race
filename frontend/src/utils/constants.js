@@ -10,6 +10,9 @@ export const AVATAR_OPTIONS = [
     { id: 'avatar8', icon: '🤖', name: 'Bot' },
 ];
 
+// --- Player Colors (used on race track and leaderboard) ---
+export const PLAYER_COLORS = ['#00ff88', '#00aaff', '#ff6b6b', '#ffdd00'];
+
 // --- Level Definitions ---
 export const LEVELS = {
     1: { name: 'Rookie', laps: 2, difficulty: 1 },
