@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGame } from '../../context/GameContext';
-import { getRaceResults } from '../../services/api';
+import api from '../../services/api.service';
 import Button from '../common/Button';
 import Loading from '../common/Loading';
 import Podium from './Podium';
@@ -18,7 +18,7 @@ export default function RaceEndPage() {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const response = await getRaceResults(raceId);
+        const response = await api.get(`/race/${raceId}/results`);
         setResults(response.data);
       } catch (error) {
         console.error('Failed to fetch results:', error);
