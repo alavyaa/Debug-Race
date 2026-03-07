@@ -13,26 +13,24 @@ const RoomPage = () => {
 
   // Fetch lobby data
   const fetchLobby = useCallback(async () => {
-    try {
-      const res = await api.get(`/lobby/${code}`);
-      setLobby(res.data);
-      setError(null);
-    } catch (err) {
-      setError("Lobby not found or server error.");
-    } finally {
-      setLoading(false);
+  try {
+    const res = await api.get(`/lobby/${code}`);
+
+    setLobby(res.data);
+    setError(null);
+
+    // 🔥 IMPORTANT
+    if (res.data.status === "racing" && res.data.currentRace) {
+      navigate(`/race/${res.data.currentRace}`);
+      return;
     }
-  }, [code]);
 
-  useEffect(() => {
-    fetchLobby();
-
-    // Auto refresh lobby every 3 seconds
-    const interval = setInterval(fetchLobby, 3000);
-
-    return () => clearInterval(interval);
-  }, [fetchLobby]);
-
+  } catch (err) {
+    setError("Lobby not found or server error.");
+  } finally {
+    setLoading(false);
+  }
+}, [code, navigate]);
   // Toggle ready
   const toggleReady = async () => {
     try {
