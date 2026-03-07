@@ -69,21 +69,15 @@ const Lobby = () => {
 
         <div className="button-group">
           <button className="primary-action" onClick={handleCreate}>
-            CREATE LOBBY
-          </button>
+  CREATE LOBBY
+  <div className="f1-car"></div> {/* F1 car element */}
+</button>
 
           <button className="secondary-action" onClick={handleJoin}>
             JOIN LOBBY
           </button>
         </div>
       </div>
-
-      {/* F1 Car Animation Overlay */}
-      <div
-        ref={f1CarRef}
-        className="f1-animation-overlay"
-        style={{ display: "none" }}
-      ></div>
     </div>
   );
 };
