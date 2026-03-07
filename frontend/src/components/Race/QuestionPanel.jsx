@@ -1,47 +1,71 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Button from '../common/Button';
 
-export default function QuestionPanel({ question, questionNumber, onAnswer }) {
+export default function QuestionPanel({ question, questionNumber, totalQuestions, onAnswer }) {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [timeLeft, setTimeLeft] = useState(question?.timeLimit || 30);
-  const [startTime] = useState(Date.now());
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [result, setResult] = useState(null);
 
-  // Timer
+  // Refs to avoid stale closures in timer and submit
+  const isSubmittedRef = useRef(false);
+  const selectedAnswerRef = useRef(null);
+  const startTimeRef = useRef(Date.now());
+  const handleSubmitRef = useRef(null);
+
+  // Keep selectedAnswerRef in sync with state
+  useEffect(() => {
+    selectedAnswerRef.current = selectedAnswer;
+  }, [selectedAnswer]);
+
+  // Reset on new question (keyed by question._id to avoid re-triggering on same question)
+  useEffect(() => {
+    isSubmittedRef.current = false;
+    selectedAnswerRef.current = null;
+    startTimeRef.current = Date.now();
+    setSelectedAnswer(null);
+    setTimeLeft(question?.timeLimit || 30);
+    setIsSubmitted(false);
+    setResult(null);
+  }, [question?._id]);
+
+  // Timer — decrement every second
   useEffect(() => {
     if (isSubmitted || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          handleSubmit(null);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTimeLeft(prev => prev - 1);
     }, 1000);
 
     return () => clearInterval(timer);
   }, [isSubmitted, timeLeft]);
 
-  // Reset on new question
+  // Auto-submit when time runs out
   useEffect(() => {
-    setSelectedAnswer(null);
-    setTimeLeft(question?.timeLimit || 30);
-    setIsSubmitted(false);
-    setResult(null);
-  }, [question]);
+    if (timeLeft === 0 && !isSubmittedRef.current) {
+      handleSubmitRef.current?.(null);
+    }
+  }, [timeLeft]);
 
   const handleSubmit = useCallback(async (answer) => {
-    if (isSubmitted) return;
-
+    if (isSubmittedRef.current) return;
+    isSubmittedRef.current = true;
     setIsSubmitted(true);
-    const responseTime = (Date.now() - startTime) / 1000;
-    
-    const response = await onAnswer(answer || selectedAnswer, responseTime);
+
+    const finalAnswer = (answer !== undefined && answer !== null)
+      ? answer
+      : selectedAnswerRef.current;
+
+    const responseTime = (Date.now() - startTimeRef.current) / 1000;
+
+    const response = await onAnswer(finalAnswer, responseTime);
     setResult(response);
-  }, [isSubmitted, selectedAnswer, startTime, onAnswer]);
+  }, [onAnswer]);
+
+  // Keep handleSubmitRef up-to-date so the timeLeft effect can call it without stale closure
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+  }, [handleSubmit]);
 
   const getTimerColor = () => {
     if (timeLeft > 20) return 'text-neon-green';
@@ -53,7 +77,9 @@ export default function QuestionPanel({ question, questionNumber, onAnswer }) {
     <div className="p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <span className="font-racing text-neon-blue">Question {questionNumber}</span>
+        <span className="font-racing text-neon-blue">
+          Question {questionNumber}{totalQuestions ? ` / ${totalQuestions}` : ''}
+        </span>
         <span className={`font-racing text-xl ${getTimerColor()}`}>
           {timeLeft}s
         </span>
@@ -100,14 +126,24 @@ export default function QuestionPanel({ question, questionNumber, onAnswer }) {
       <div className="space-y-3 mb-4">
         {question?.options?.map((option) => {
           let optionClass = 'border-gray-600 hover:border-neon-blue/50 text-gray-300';
-          if (isSubmitted) {
-            if (option.id === result?.correctAnswer) {
-              optionClass = 'border-neon-green bg-neon-green/20 text-neon-green';
-            } else if (option.id === selectedAnswer && !result?.isCorrect) {
-              optionClass = 'border-red-500 bg-red-500/20 text-red-500';
+          if (isSubmitted && result) {
+            if (result.isCorrect && option.id === selectedAnswer) {
+              // User's correct answer
+              optionClass = 'border-green-500 bg-green-500/20 text-green-400';
+            } else if (!result.isCorrect && option.id === selectedAnswer) {
+              // User's wrong answer
+              optionClass = 'border-red-500 bg-red-500/20 text-red-400';
+            } else if (option.id === result?.correctAnswer) {
+              // Show the correct answer even when user was wrong
+              optionClass = 'border-green-500 bg-green-500/20 text-green-400';
             } else {
-              optionClass = 'border-gray-600 text-gray-400';
+              optionClass = 'border-gray-700 text-gray-500';
             }
+          } else if (isSubmitted) {
+            // result not yet loaded — keep neutral
+            optionClass = option.id === selectedAnswer
+              ? 'border-neon-blue bg-neon-blue/20 text-white'
+              : 'border-gray-600 text-gray-400';
           } else if (selectedAnswer === option.id) {
             optionClass = 'border-neon-blue bg-neon-blue/20 text-white';
           }
