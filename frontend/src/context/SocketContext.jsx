@@ -2,8 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { io } from 'socket.io-client';
 
 const SocketContext = createContext();
-
-const SOCKET_URL = "https://debug-race-production-b38c.up.railway.app" ;
+const SOCKET_URL = "https://debug-race-production-b38c.up.railway.app";
 
 export function SocketProvider({ children }) {
   const [socket, setSocket] = useState(null);
@@ -12,14 +11,28 @@ export function SocketProvider({ children }) {
 
   useEffect(() => {
     console.log('🔌 Initializing socket connection to:', SOCKET_URL);
-    
+
+    // ✅ FIX: localStorage se user lo aur auth mein bhejo
+    let user = null;
+    try {
+      const savedUser = localStorage.getItem('debugrace_user');
+      if (savedUser) user = JSON.parse(savedUser);
+    } catch(e) {}
+
+    console.log('👤 Connecting as:', user?.username || 'anonymous');
+
     const newSocket = io(SOCKET_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      timeout: 20000
+      timeout: 20000,
+      // ✅ username connection ke saath hi bhejo
+      auth: {
+        username: user?.username || null,
+        userId: user?._id || null,
+      }
     });
 
     newSocket.on('connect', () => {
@@ -57,7 +70,6 @@ export function SocketProvider({ children }) {
     };
   }, []);
 
-  // Emit wrapper with error handling
   const emit = useCallback((event, data) => {
     if (socket && isConnected) {
       console.log('📤 Emitting:', event, data);
@@ -67,14 +79,12 @@ export function SocketProvider({ children }) {
     }
   }, [socket, isConnected]);
 
-  // Subscribe to events
   const on = useCallback((event, callback) => {
     if (socket) {
       socket.on(event, callback);
     }
   }, [socket]);
 
-  // Unsubscribe from events
   const off = useCallback((event, callback) => {
     if (socket) {
       socket.off(event, callback);
