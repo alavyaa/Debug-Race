@@ -53,7 +53,7 @@ export default function RacePage() {
 
         const firstQ = getLapQuestion(raceResp, 1, 0);
         if (firstQ) {
-          setCurrentQuestion(firstQ.question);
+          setCurrentQuestion(firstQ?.question);
           setShowQuestion(true);
         }
 
