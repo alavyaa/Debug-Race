@@ -89,23 +89,20 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
     return '#ff4444';
   };
 
-  const getOptionClass = (option) => {
-    if (isSubmitted && result) {
-      const isCorrectOption = option.id === result.correctAnswer;
-      const isMyWrongAnswer = option.id === selectedAnswer && !result.isCorrect;
+  // Normalize options to always be { id, text } objects regardless of how they're stored
+  const options = question?.options?.map((opt, i) => ({
+    id: typeof opt === 'object' ? opt.id : String.fromCharCode(65 + i),
+    text: typeof opt === 'object' ? opt.text : opt,
+  })) || [];
 
-      if (isCorrectOption) {
-        return 'border-neon-green bg-neon-green/20 text-neon-green';
-      } else if (isMyWrongAnswer) {
-        return 'border-red-500 bg-red-500/20 text-red-500';
-      } else {
-        return 'border-gray-600 text-gray-400';
-      }
+  const getOptionStyle = (optId) => {
+    if (isSubmitted && result) {
+      if (optId === result.correctAnswer) return 'border-2 border-neon-green bg-neon-green/20 text-neon-green';
+      if (optId === selectedAnswer && !result.isCorrect) return 'border-2 border-red-500 bg-red-500/20 text-red-400';
+      return 'border-2 border-gray-600 text-gray-400';
     }
-    if (selectedAnswer === option.id) {
-      return 'border-neon-blue bg-neon-blue/20 text-white';
-    }
-    return 'border-gray-600 hover:border-neon-blue/50 text-gray-300';
+    if (selectedAnswer === optId) return 'border-2 border-neon-blue bg-neon-blue/20 text-white';
+    return 'border-2 border-gray-600 hover:border-neon-blue/50 text-gray-300';
   };
 
   return (
@@ -161,15 +158,15 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
 
       {/* Options */}
       <div className="space-y-3 mb-4">
-        {question?.options?.map((option) => (
+        {options.map((opt) => (
           <button
-            key={option.id}
-            onClick={() => !isSubmitted && setSelectedAnswer(option.id)}
+            key={opt.id}
+            onClick={() => !isSubmitted && setSelectedAnswer(opt.id)}
             disabled={isSubmitted}
-            className={`w-full p-4 rounded-lg border-2 text-left transition-all ${getOptionClass(option)}`}
+            className={`w-full p-4 rounded-lg text-left transition-all ${getOptionStyle(opt.id)}`}
           >
-            <span className="font-racing mr-3">{option.id}.</span>
-            <span className="font-body">{option.text}</span>
+            <span className="font-racing mr-3">{opt.id}.</span>
+            <span className="font-body">{opt.text}</span>
           </button>
         ))}
       </div>

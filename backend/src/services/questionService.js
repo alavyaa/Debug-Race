@@ -23,44 +23,8 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
       console.log(`  Generating Lap ${lap}, Question ${q + 1} (${questionType})`);
       
       try {
-        // Try to get from cache first
-        let question = await Question.findOne({
-          language,
-          difficulty: level,
-          type: questionType,
-          isAIGenerated: true
-        }).skip(Math.floor(Math.random() * 5));
+        console.log(`    🤖 Generating new AI question...`);
         
-        // If not in cache or want fresh, generate new
-        if (!question || Math.random() > 0.7) { // 30% chance to generate fresh
-          console.log(`    🤖 Generating new AI question...`);
-          
-          const questionData = await generateQuestion({
-            language,
-            difficulty: level,
-            type: questionType
-          });
-          
-          // Save to database for caching
-          question = await Question.create({
-            ...questionData,
-            language,
-            difficulty: level,
-            type: questionType,
-            isAIGenerated: true
-          });
-          
-          console.log(`    ✅ New question created and cached`);
-        } else {
-          console.log(`    📦 Using cached question: ${question._id}`);
-        }
-        
-        questions.push(question);
-        
-      } catch (error) {
-        console.error(`    ❌ Error generating question:`, error.message);
-        
-        // Use fallback
         const questionData = await generateQuestion({
           language,
           difficulty: level,
@@ -72,10 +36,32 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
           language,
           difficulty: level,
           type: questionType,
-          isAIGenerated: false
+          isAIGenerated: true
         });
         
+        console.log(`    ✅ New question created`);
         questions.push(question);
+        
+      } catch (error) {
+        console.error(`    ❌ Error generating question:`, error.message);
+        // Attempt fallback so the race still has the expected number of questions
+        try {
+          const fallbackData = await generateQuestion({
+            language,
+            difficulty: level,
+            type: questionType
+          });
+          const fallbackQuestion = await Question.create({
+            ...fallbackData,
+            language,
+            difficulty: level,
+            type: questionType,
+            isAIGenerated: false
+          });
+          questions.push(fallbackQuestion);
+        } catch (fallbackErr) {
+          console.error(`    ❌ Fallback also failed:`, fallbackErr.message);
+        }
       }
     }
   }
