@@ -11,11 +11,11 @@ module.exports = function(io, socket){
     playerMeta.set(socket.id, { username: resolvedUsername, userId: resolvedUserId, raceId });
     console.log(`Player joined: ${resolvedUsername} | race: ${raceId} | socket: ${socket.id}`);
 
-    // Naye player ko existing players ka data bhejo
-    playerStats.forEach((stats, socketId) => {
+    // ✅ FIX: playerMeta se dhundho (playerStats empty ho sakta hai naye player ka)
+    playerMeta.forEach((otherMeta, socketId) => {
       if (socketId === socket.id) return;
-      const otherMeta = playerMeta.get(socketId) || {};
       if (otherMeta.raceId !== raceId) return;
+      const stats = playerStats.get(socketId) || { lap: 1, position: 0, speed: 50 };
       socket.emit('positionUpdate', {
         playerId: socketId,
         username: otherMeta.username,
@@ -24,6 +24,16 @@ module.exports = function(io, socket){
         position: stats.position,
         speed: stats.speed,
       });
+    });
+
+    // ✅ FIX: doosre players ko bhi bata do naya player join hua
+    socket.to(raceId).emit('positionUpdate', {
+      playerId: socket.id,
+      username: resolvedUsername,
+      avatar: "",
+      lap: 1,
+      position: 0,
+      speed: 50,
     });
   });
 
