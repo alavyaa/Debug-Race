@@ -233,7 +233,7 @@ export default function RacePage() {
 
           {/* Leaderboard */}
           <div style={{ padding: '16px', borderBottom: '1px solid rgba(0,170,255,0.15)' }}>
-            <Leaderboard positions={positions} currentUserId={socket?.id} />
+            <Leaderboard positions={positions} currentUserId={state.user?._id} />
           </div>
 
           {/* Question Panel */}
