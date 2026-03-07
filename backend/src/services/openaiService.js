@@ -1,7 +1,8 @@
 const OpenAI = require('openai');
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: 'https://openrouter.ai/api/v1'
 });
 
 // Skill focus areas by level
@@ -109,14 +110,13 @@ RETURN ONLY VALID JSON WITHOUT MARKDOWN CODE BLOCKS.`;
     console.log(`🤖 Generating ${type} question for ${language} (Level ${difficulty}, Focus: ${skillFocus})`);
     
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "mistralai/mistral-small",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `Generate a ${type} question for ${language} at difficulty ${difficulty}.` }
       ],
       temperature: 0.7,
-      max_tokens: 1000,
-      response_format: { type: "json_object" }
+      max_tokens: 1000
     });
 
     const content = completion.choices[0].message.content;
