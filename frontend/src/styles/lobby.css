@@ -125,6 +125,39 @@
   color: black;
 }
 
+/* F1 Car Animation Overlay */
+.f1-animation-overlay {
+  position: fixed;
+  top: 50%;
+  left: -150px; /* start off-screen left */
+  width: 150px;
+  height: 80px;
+  background: url('https://i.postimg.cc/3xQ0QbXr/f1-car.png') no-repeat center;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translateY(-50%);
+  animation: f1-move 1.8s forwards;
+}
+
+/* Keyframes for F1 car moving left → right */
+@keyframes f1-move {
+  0% {
+    left: -150px;
+    transform: translateY(-50%) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    left: 50%;
+    transform: translateY(-50%) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    transform: translateY(-50%) rotate(-5deg);
+    opacity: 0;
+  }
+}
 /* Grey Buttons */
 /* .neutral-action {
   border-color: #555;
