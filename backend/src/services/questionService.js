@@ -12,9 +12,75 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
   const questions = [];
   const questionsPerLap = 2;
 
+  console.log(`📚 Generating ${totalLaps * questionsPerLap} questions for ${language} (Level ${level})`);
+
   for (let lap = 1; lap <= totalLaps; lap++) {
     for (let q = 0; q < questionsPerLap; q++) {
+      // Lap 1: MCQ only
+      // Lap 2+: First question MCQ, second question DEBUG
       const questionType = lap === 1 ? 'MCQ' : (q === 0 ? 'MCQ' : 'DEBUG');
+
+      console.log(`  Generating Lap ${lap}, Question ${q + 1} (${questionType})`);
+
+      try {
+        // Try to get from cache first
+        let question = await Question.findOne({
+          language,
+          difficulty: level,
+          type: questionType,
+          isAIGenerated: true
+        }).skip(Math.floor(Math.random() * 5));
+
+        // If not in cache or want fresh, generate new
+        if (!question || Math.random() > 0.7) { // 30% chance to generate fresh
+          console.log(`    🤖 Generating new AI question...`);
+
+          const questionData = await generateQuestion({
+            language,
+            difficulty: level,
+            type: questionType
+          });
+
+          // Save to database for caching
+          question = await Question.create({
+            ...questionData,
+            language,
+            difficulty: level,
+            type: questionType,
+            isAIGenerated: true
+          });
+
+          console.log(`    ✅ New question created and cached`);
+        } else {
+          console.log(`    📦 Using cached question: ${question._id}`);
+        }
+
+        questions.push(question);
+
+      } catch (error) {
+        console.error(`    ❌ Error generating question:`, error.message);
+
+        // Use fallback
+        const questionData = await generateQuestion({
+          language,
+          difficulty: level,
+          type: questionType
+        });
+
+        const question = await Question.create({
+          ...questionData,
+          language,
+          difficulty: level,
+          type: questionType,
+          isAIGenerated: false
+        });
+
+        questions.push(question);
+      }
+    }
+  }
+
+  console.log(`✅ Generated ${questions.length} questions`);
   return questions;
 };
 
