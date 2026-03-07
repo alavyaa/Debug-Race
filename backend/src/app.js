@@ -8,6 +8,7 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
+    "https://debug-race-ztam.onrender.com",
     /https:\/\/debug-race.*\.vercel\.app/
   ],
   credentials: true
