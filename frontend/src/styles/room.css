@@ -1,0 +1,152 @@
+/* Background */
+.room-container {
+  min-height: 100vh;
+  background: #050505;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 165, 0, 0.03) 0px,
+    rgba(255, 165, 0, 0.03) 2px,
+    transparent 2px,
+    transparent 20px
+  );
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  padding: 40px;
+}
+
+/* Header */
+.room-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.room-title {
+  font-size: 32px;
+  letter-spacing: 3px;
+}
+
+.room-title span {
+  color: #00eaff;
+}
+
+/* Leave Button */
+.leave-btn {
+  padding: 12px 20px;
+  background: transparent;
+  border: 2px solid #ff3b3b;
+  color: #ff3b3b;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: 0.3s;
+}
+
+.leave-btn:hover {
+  background: #ff3b3b;
+  color: black;
+}
+
+/* Lobby Status */
+.room-status {
+  margin-bottom: 30px;
+}
+
+.room-status p {
+  margin-bottom: 6px;
+  letter-spacing: 2px;
+}
+
+.status {
+  color: #ffd700;
+}
+
+.leader {
+  color: #00ff8c;
+}
+
+/* Players Grid */
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+/* Player Card */
+.player-card {
+  padding: 20px;
+  border: 1px solid #333;
+  background: #111118;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.player-card:hover {
+  border-color: #ff6a00;
+  transform: translateY(-2px);
+}
+
+.player-name {
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.player-status {
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* Ready Indicator */
+.ready-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.ready {
+  background: #00ff8c;
+}
+
+.not-ready {
+  background: #ff3b3b;
+}
+
+/* Controls */
+.room-controls {
+  margin-top: 50px;
+  display: flex;
+  gap: 20px;
+}
+
+/* Buttons */
+.room-btn {
+  padding: 16px 30px;
+  font-size: 16px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  background: transparent;
+  border: 2px solid;
+  transition: 0.3s;
+}
+
+/* Ready Button */
+.ready-btn {
+  border-color: #00aaff;
+  color: #00aaff;
+}
+
+.ready-btn:hover {
+  background: #00aaff;
+  color: black;
+}
+
+/* Start Race Button */
+.start-btn {
+  border-color: #00ff8c;
+  color: #00ff8c;
+}
+
+.start-btn:hover {
+  background: #00ff8c;
+  color: black;
+}
