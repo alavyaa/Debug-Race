@@ -200,14 +200,15 @@ async function startRaceController(req, res) {
         message: "Only leader can start the race",
       });
     }
-    if (lobby.status !== "ready") {
+    const allReady = lobby.members.length > 0 && lobby.members.every(m => m.isReady);
+    if (!allReady) {
       return res.status(400).json({
         message: "All players must be ready",
       });
     }
-    if (lobby.members.length < 2) {
+    if (lobby.members.length < 1) {
       return res.status(400).json({
-        message: "At least 2 players required",
+        message: "At least 1 player required",
       });
     }
     // Generate questions for the race
