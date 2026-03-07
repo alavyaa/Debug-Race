@@ -95,16 +95,6 @@ Do NOT include markdown.
   max_tokens: 800
 });
 
-if (!completion || !completion.choices || completion.choices.length === 0) {
-  throw new Error("Invalid response from OpenRouter");
-}
-
-const content = completion.choices[0]?.message?.content;
-
-if (!content) {
-  throw new Error("Empty AI response");
-}
-
     /**
      * Safety check for API response
      */
