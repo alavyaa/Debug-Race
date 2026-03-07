@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api.service";
+import "../styles/room.css";   // 🔥 ADD THIS
 
 const RoomPage = () => {
   const { code } = useParams();
@@ -21,7 +22,7 @@ const RoomPage = () => {
       setLobby(res.data);
       setError(null);
 
-      // 🔥 If race started → redirect to race page
+      // 🔥 If race started → redirect
       if (res.data.status === "racing" && res.data.currentRace) {
         navigate(`/race/${res.data.currentRace}`);
         return;
@@ -34,7 +35,7 @@ const RoomPage = () => {
     }
   }, [code, navigate]);
 
-  // 🔥 Poll lobby every 3 seconds
+  // Poll lobby every 3 seconds
   useEffect(() => {
     if (!code) return;
 
@@ -91,98 +92,105 @@ const RoomPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen text-white">
-        Loading Lobby...
+      <div className="room-container">
+        <div className="hero-section">
+          <p>Loading Lobby...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen text-red-400">
-        <p>{error}</p>
-        <button
-          onClick={() => navigate("/lobby")}
-          className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-        >
-          Back to Lobby
-        </button>
+      <div className="room-container">
+        <div className="hero-section">
+          <p>{error}</p>
+          <button
+            onClick={() => navigate("/lobby")}
+            className="primary-action"
+          >
+            Back to Lobby
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white p-8">
+    <div className="room-container">
 
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">
-          Lobby Code: <span className="text-cyan-400">{lobby.code}</span>
+      <div className="room-header">
+        <h1 className="room-title">
+          LOBBY CODE: <span>{lobby.code}</span>
         </h1>
 
         <button
           onClick={leaveLobby}
-          className="px-4 py-2 bg-red-600 rounded hover:bg-red-700"
+          className="leave-btn"
         >
-          Leave Lobby
+          LEAVE LOBBY
         </button>
       </div>
 
-      {/* Lobby Status */}
-      <div className="mb-6">
-        <p>Status: <span className="text-yellow-400">{lobby.status}</span></p>
-        <p>Leader: <span className="text-green-400">{lobby.leader.username}</span></p>
+      {/* Status */}
+      <div className="room-status">
+        <p>
+          STATUS: <span className="status">{lobby.status}</span>
+        </p>
+
+        <p>
+          LEADER: <span className="leader">{lobby.leader.username}</span>
+        </p>
       </div>
 
-      {/* Player List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Players */}
+      <div className="players-grid">
 
         {lobby.members.map((member) => (
           <div
             key={member.user._id}
-            className="p-4 border border-gray-700 rounded bg-[#111118]"
+            className="player-card"
           >
-
             <div className="flex justify-between items-center">
 
               <div>
-                <p className="text-lg font-semibold">{member.username}</p>
-                <p className="text-sm text-gray-400">
+                <p className="player-name">{member.username}</p>
+                <p className="player-status">
                   {member.isReady ? "Ready" : "Not Ready"}
                 </p>
               </div>
 
               <div
-                className={`w-3 h-3 rounded-full ${
-                  member.isReady ? "bg-green-500" : "bg-red-500"
+                className={`ready-indicator ${
+                  member.isReady ? "ready" : "not-ready"
                 }`}
               />
 
             </div>
-
           </div>
         ))}
 
       </div>
 
       {/* Controls */}
-      <div className="mt-10 flex gap-4">
+      <div className="room-controls">
 
         <button
           onClick={toggleReady}
           disabled={updating}
-          className="px-6 py-2 bg-blue-600 rounded hover:bg-blue-700"
+          className="room-btn ready-btn"
         >
-          Toggle Ready
+          TOGGLE READY
         </button>
 
         {lobby.status === "ready" && (
           <button
             onClick={startRace}
             disabled={updating}
-            className="px-6 py-2 bg-green-600 rounded hover:bg-green-700"
+            className="room-btn start-btn"
           >
-            Start Race
+            START RACE
           </button>
         )}
 
