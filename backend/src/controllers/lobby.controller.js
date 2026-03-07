@@ -224,63 +224,81 @@ async function toggleReadyController(req, res) {
 
 /**
  * Start Race
- */// ...existing imports...
-
+ */
 async function startRaceController(req, res) {
   try {
     const { code } = req.params;
+
     const lobby = await lobbyModel.findOne({ code });
+
     if (!lobby) {
       return res.status(404).json({ message: "Lobby not found" });
     }
-    // Only leader can start
+
     if (lobby.leader.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Only leader can start the race" });
+      return res.status(403).json({
+        message: "Only the leader can start the race",
+      });
     }
 
-    // FIX: check if all players are ready, not lobby.status
-    const allReady = lobby.members.length > 0 && lobby.members.every(m => m.isReady === true);
-    if (!allReady) {
-      return res.status(400).json({ message: "All players must be ready" });
+    if (lobby.members.length < 2) {
+      return res.status(400).json({
+        message: "At least 2 players required",
+      });
     }
-    // FIX: allow even 1 player
-    if (lobby.members.length < 1) {
-      return res.status(400).json({ message: "At least 1 player required" });
+
+    const allReady = lobby.members.every((m) => m.isReady);
+
+    if (!allReady) {
+      return res.status(400).json({
+        message: "All players must be ready",
+      });
     }
 
     const totalLaps = 2;
+
     const generatedQuestions = await generateQuestionsForRace(
       lobby.settings.language,
       lobby.settings.level,
       totalLaps
     );
-    // Create Race
+
     const race = await raceModel.create({
-      lobby: lobby._id,
-      players: lobby.members.map((m) => ({
-        user: m.user,
-        completed: false,
-        finishTime: null,
-        submissions: 0,
-        score: 0,
-        username: m.username, // Pass username for UI
-        avatar: m.avatar,
-      })),
-      questions: generatedQuestions,
-      settings: { language: lobby.settings.language, level: lobby.settings.level, totalLaps },
-      startTime: new Date(),
-      status: "ongoing",
-    });
+  lobby: lobby._id,
+  players: lobby.members.map((m) => ({
+    user: m.user,
+    completed: false,
+    finishTime: null,
+    submissions: 0,
+    score: 0,
+  })),
+
+  questions: generatedQuestions.map((q) => ({
+    question: q._id
+  })),
+
+  settings: {
+    language: lobby.settings.language,
+    level: lobby.settings.level,
+    totalLaps,
+  },
+
+  startTime: new Date(),
+  status: "ongoing",
+});
 
     lobby.status = "racing";
     lobby.currentRace = race._id;
+
     await lobby.save();
 
     res.status(200).json({
       message: "Race started successfully",
       race,
     });
+
   } catch (error) {
+    console.error("Start race error:", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 }
