@@ -120,7 +120,7 @@ export default function RaceTrack({ players = [], currentUserId }) {
       // position 0→1 maps to angle 0→2π, starting at bottom (π/2) going clockwise
       const startAngle = Math.PI / 2;
       const angle = startAngle + (player.position || 0) * Math.PI * 2;
-      const laneOffset = idx * 6;
+      const laneOffset = idx * 10;
       const pt = getTrackPoint(angle, cx, cy, rx - laneOffset, ry - laneOffset);
 
       const radius = isMe ? 10 : 8;
