@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGame } from '../../context/GameContext';
 import { useSocket } from '../../context/SocketContext';
-import { getRace, submitAnswer, generateQuestion } from '../../services/api';
+import api from "../../services/api.service";
 import Phaser from 'phaser';
 import { RaceScene } from '../../game/scenes/RaceScene';
 import QuestionPanel from './QuestionPanel';
