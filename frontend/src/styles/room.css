@@ -1,152 +1,274 @@
+/* Update Font Import for eSports Feel */
+@import url('https://fonts.googleapis.com/css2?family=Changa:wght@400;700&family=Orbitron:wght@500;800&display=swap');
+
+/* --- Define Gradient Theme (Yellow-Orange) --- */
+:root {
+  --neon-orange: #FF6B00;
+  --neon-yellow: #FFB800;
+  --bg-dark-black: #050505;
+  --bg-card: #0A0A0A;
+  --text-white: #FFFFFF;
+  --text-grey: #BBBBBB;
+  
+  /* Primary eSports Gradient */
+  --esports-gradient: linear-gradient(135deg, var(--neon-yellow) 0%, var(--neon-orange) 100%);
+  
+  /* Accent Red for Leave (keeps some standard convention) */
+  --accent-red: #ff3b3b;
+}
+
 /* Background */
 .room-container {
   min-height: 100vh;
-  background: #050505;
-  background-image: repeating-linear-gradient(
-    -45deg,
-    rgba(255, 165, 0, 0.03) 0px,
-    rgba(255, 165, 0, 0.03) 2px,
-    transparent 2px,
-    transparent 20px
-  );
-  color: white;
-  font-family: 'Orbitron', sans-serif;
-  padding: 40px;
+  /* Use your custom eSports background image with a dark overlay */
+  background: 
+    linear-gradient(to bottom, rgba(5, 5, 5, 0.9) 0%, rgba(5, 5, 5, 0.7) 100%),
+    url('path-to-your-esports-image.jpg') center/cover no-repeat fixed; /* Replace image path! */
+  color: var(--text-white);
+  /* Changa for main text is more aggressive, Orbitron for headers/titles */
+  font-family: 'Changa', sans-serif;
+  padding: 50px 7vw; /* Added percentage padding for better scaling */
 }
 
-/* Header */
+/* --- Header Section --- */
 .room-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
+  align-items: flex-start; /* Better alignment with larger fonts */
+  margin-bottom: 50px;
+  border-bottom: 2px solid;
+  border-image: var(--esports-gradient) 1; /* Underline uses the gradient */
+  padding-bottom: 15px;
 }
 
 .room-title {
-  font-size: 32px;
-  letter-spacing: 3px;
+  font-family: 'Orbitron', sans-serif; /* Keep title on Orbitron */
+  font-weight: 800;
+  font-size: 38px; /* Slightly larger */
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin: 0;
 }
 
 .room-title span {
-  color: #00eaff;
+  color: var(--neon-orange); /* Or keep it orange, but let's try the lobby code for the bright accent */
+}
+
+/* Use Lobby Code as the main eSports focus element in the header */
+.room-title strong { /* Assuming your HTML might structure the code slightly differently, or target by content if needed */
+  font-size: 1.2em; /* Emphasize the code */
+}
+
+/* Specific styling for the actual code part of the title */
+.lobby-code-display { /* This might require adding a class to your HTML, e.g., <h1 class="room-title">LOBBY CODE: <span class="lobby-code-display">796742</span></h1> */
+  color: var(--neon-yellow);
+  text-shadow: 0 0 10px rgba(255, 184, 0, 0.7); /* Subtle neon glow */
 }
 
 /* Leave Button */
 .leave-btn {
-  padding: 12px 20px;
+  padding: 10px 18px;
+  font-size: 14px;
   background: transparent;
-  border: 2px solid #ff3b3b;
-  color: #ff3b3b;
+  border: 1px solid var(--accent-red);
+  color: var(--accent-red);
   cursor: pointer;
   letter-spacing: 2px;
-  transition: 0.3s;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif;
+  transition: 0.3s ease;
+  transform: skewX(-10deg); /* Skew for eSports angular feel */
 }
 
 .leave-btn:hover {
-  background: #ff3b3b;
+  background: var(--accent-red);
   color: black;
+  transform: skewX(-10deg) scale(1.05); /* Slight push-out on hover */
 }
 
-/* Lobby Status */
+/* --- Lobby Status --- */
 .room-status {
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  background-color: rgba(255, 255, 255, 0.03); /* Subtle backdrop */
+  padding: 15px 25px;
+  border-left: 3px solid;
+  border-image: var(--esports-gradient) 1;
 }
 
 .room-status p {
-  margin-bottom: 6px;
-  letter-spacing: 2px;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  color: var(--text-white);
+  display: flex; /* Aligns label and value nicely */
+  justify-content: space-between;
+  width: fit-content;
+}
+
+/* Style for labels (e.g., STATUS:, LEADER:) */
+.room-status p strong { 
+    color: var(--text-grey);
+    margin-right: 15px;
+    font-size: 0.9em;
 }
 
 .status {
-  color: #ffd700;
+  color: var(--neon-yellow); /* Yellow for 'waiting' fits 'ready' state logic */
+  font-weight: bold;
 }
 
 .leader {
-  color: #00ff8c;
+  color: var(--neon-orange); /* Use Orange as the main identity color */
+  font-weight: bold;
 }
 
-/* Players Grid */
+/* --- Players Grid & Cards --- */
 .players-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Increased min-width for larger cards */
+  gap: 30px;
 }
 
 /* Player Card */
 .player-card {
-  padding: 20px;
-  border: 1px solid #333;
-  background: #111118;
-  border-radius: 6px;
-  transition: 0.3s;
+  padding: 25px; /* Increased padding */
+  border: none;
+  background-color: var(--bg-card);
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Add depth */
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: space-between; /* Put indicator at the end */
+  align-items: center;
+  position: relative; /* For top bar effect */
+}
+
+/* Top accent bar on each card, using the theme gradient */
+.player-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--esports-gradient);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
 }
 
 .player-card:hover {
-  border-color: #ff6a00;
-  transform: translateY(-2px);
+  border-color: transparent; /* No longer border-based hover */
+  transform: translateY(-5px) scale(1.02); /* More aggressive movement */
+  box-shadow: 0 8px 15px rgba(255, 107, 0, 0.2); /* Orange-tinted shadow glow */
+}
+
+/* Group player info together (left side) */
+.player-info { /* New wrapper in HTML would be good, but we can structure inside this .player-card if needed */
+    display: flex;
+    flex-direction: column;
 }
 
 .player-name {
-  font-size: 18px;
-  letter-spacing: 2px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: var(--text-white);
+  margin-bottom: 5px;
 }
 
 .player-status {
+  font-family: 'Changa', sans-serif;
   font-size: 14px;
-  color: #aaa;
+  color: var(--text-grey);
+  letter-spacing: 1px;
 }
 
 /* Ready Indicator */
 .ready-indicator {
-  width: 10px;
-  height: 10px;
+  width: 14px; /* Slightly larger */
+  height: 14px;
   border-radius: 50%;
+  box-shadow: 0 0 10px; /* Base shadow for glow effect */
 }
 
 .ready {
-  background: #00ff8c;
+  background: var(--neon-yellow); /* Matching 'ready' to the bright color */
+  box-shadow: 0 0 10px rgba(255, 184, 0, 0.8);
 }
 
 .not-ready {
-  background: #ff3b3b;
+  background: var(--accent-red); /* Keep not-ready red for visibility */
+  box-shadow: 0 0 10px rgba(255, 59, 59, 0.8);
 }
 
-/* Controls */
+/* --- Controls Section --- */
 .room-controls {
-  margin-top: 50px;
+  margin-top: 60px; /* Increased top margin */
   display: flex;
-  gap: 20px;
+  gap: 25px;
+  justify-content: center; /* Center buttons for strong presence */
 }
 
-/* Buttons */
+/* Buttons Base with eSports Styling */
 .room-btn {
-  padding: 16px 30px;
-  font-size: 16px;
+  padding: 16px 35px;
+  font-size: 18px;
+  font-weight: 700;
   letter-spacing: 2px;
   cursor: pointer;
   background: transparent;
   border: 2px solid;
-  transition: 0.3s;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  position: relative; /* for fill animation */
+  overflow: hidden; /* for fill animation */
 }
 
-/* Ready Button */
+/* Ready Button - Uses Gradient Outline, Solid Fill on Hover */
 .ready-btn {
-  border-color: #00aaff;
-  color: #00aaff;
+  border-color: transparent; /* No solid border, uses pseudo element */
+  color: var(--neon-yellow);
+}
+
+/* Pseudo element to create the gradient outline */
+.ready-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 2px; /* Slight inset for better effect */
+    padding: 2px; /* Outline thickness */
+    background: var(--esports-gradient);
+    -webkit-mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
 }
 
 .ready-btn:hover {
-  background: #00aaff;
+  background: var(--esports-gradient); /* Solid gradient fill on hover */
   color: black;
+  box-shadow: 0 5px 15px rgba(255, 184, 0, 0.4);
 }
 
-/* Start Race Button */
+/* Start Race Button - More Solid/Primary for the Action */
 .start-btn {
-  border-color: #00ff8c;
-  color: #00ff8c;
+  background: var(--esports-gradient);
+  border-color: transparent;
+  color: black; /* Solid black text for contrast */
 }
 
 .start-btn:hover {
-  background: #00ff8c;
-  color: black;
+  background: linear-gradient(135deg, var(--neon-orange) 0%, var(--neon-yellow) 100%); /* Reversed gradient or brighter on hover */
+  transform: scale(1.05); /* Make the main action button pulsate slightly on hover */
+  box-shadow: 0 5px 20px rgba(255, 107, 0, 0.5);
+}
+
+/* Adjustments for smaller screens (minimal for now) */
+@media (max-width: 600px) {
+    .room-container { padding: 30px 4vw; }
+    .room-header { flex-direction: column; align-items: center; text-align: center; }
+    .room-title { font-size: 28px; margin-bottom: 20px; }
+    .leave-btn { position: absolute; top: 10px; right: 10px; } /* Optional placement */
 }
