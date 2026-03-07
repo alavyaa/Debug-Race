@@ -101,9 +101,8 @@ Players can:
 
 -  Create Team
 -  Join Team
--  Leaderboard
--  Stats
 
+  
 Example Team Code:
 
 ---
