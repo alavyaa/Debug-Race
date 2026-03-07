@@ -136,6 +136,7 @@ async function getPlayers(req, res) {
       status: lobby.status,
       settings: lobby.settings,
       levelInfo: lobby.settings.level,
+      currentRace: lobby.currentRace,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -235,11 +236,49 @@ async function startRaceController(req, res) {
     });
   }
 }
+
+async function updateSettingsController(req, res) {
+  try {
+    const { code } = req.params;
+    const { language, level } = req.body;
+    const lobby = await lobbyModel.findOne({ code });
+    if (!lobby) {
+      return res.status(404).json({ message: "Lobby not found" });
+    }
+    // Only leader can update settings
+    if (lobby.leader.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Only the leader can change settings" });
+    }
+    // Validate language
+    const validLanguages = ["C", "Python", "Java", "JavaScript"];
+    if (language !== undefined && !validLanguages.includes(language)) {
+      return res.status(400).json({ message: "Invalid language" });
+    }
+    // Validate level
+    if (level !== undefined && (level < 1 || level > 5)) {
+      return res.status(400).json({ message: "Level must be between 1 and 5" });
+    }
+    if (language !== undefined) lobby.settings.language = language;
+    if (level !== undefined) lobby.settings.level = level;
+    await lobby.save();
+    res.status(200).json({
+      message: "Settings updated successfully",
+      settings: {
+        language: lobby.settings.language,
+        level: lobby.settings.level,
+        maxPlayers: lobby.settings.maxPlayers,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+}
 module.exports = {
   createLobbyController,
   joinLobbyController,
   exitLobbyController,
   getPlayers,
   toggleReadyController,
-  startRaceController
+  startRaceController,
+  updateSettingsController
 };

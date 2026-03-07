@@ -1,16 +1,38 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api.service";
+import { useAuth } from "../features/auth/features.authContext";
 import "../styles/room.css";
+
+const LEVEL_INFO = [
+  { level: 1, laps: 1, focus: "Syntax Basics", track: "Beginner Track" },
+  { level: 2, laps: 2, focus: "Logic Errors", track: "Rookie Track" },
+  { level: 3, laps: 3, focus: "Algorithm Bugs", track: "Pro Track" },
+  { level: 4, laps: 4, focus: "Complex Logic", track: "Expert Track" },
+  { level: 5, laps: 5, focus: "Advanced Algorithms", track: "Champion Track" },
+];
+
+const LANGUAGES = ["C", "Java", "Python", "JavaScript"];
 
 const RoomPage = () => {
   const { code } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [lobby, setLobby] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [settings, setSettings] = useState({ language: "JavaScript", level: 1 });
+
+  // Leader detection — handles both populated and raw ObjectId forms
+  const userId = user?._id || user?.id;
+  const isLeader =
+    lobby &&
+    userId &&
+    (lobby.leader?._id
+      ? lobby.leader._id.toString() === userId.toString()
+      : lobby.leader?.toString() === userId.toString());
 
   // Fetch lobby data
   const fetchLobby = useCallback(async () => {
@@ -20,6 +42,10 @@ const RoomPage = () => {
       const res = await api.get(`/lobby/${code}`);
 
       setLobby(res.data);
+      setSettings({
+        language: res.data.settings?.language || "JavaScript",
+        level: res.data.settings?.level || 1,
+      });
       setError(null);
 
       // If race started → redirect
@@ -59,6 +85,19 @@ const RoomPage = () => {
     }
   };
 
+  // Update settings (leader only)
+  const updateSettings = async (newSettings) => {
+    try {
+      setUpdating(true);
+      await api.patch(`/lobby/${code}/settings`, newSettings);
+      await fetchLobby();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   // Start race
   const startRace = async () => {
     try {
@@ -78,10 +117,16 @@ const RoomPage = () => {
     }
   };
 
-  // Leave lobby (FIXED)
- const leaveLobby = () => {
-  navigate("/lobby");
-};
+  // Leave lobby
+  const leaveLobby = async () => {
+    try {
+      await api.post(`/lobby/${code}/leave`);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      navigate("/lobby");
+    }
+  };
 
   if (loading) {
     return (
@@ -140,6 +185,55 @@ const RoomPage = () => {
         </p>
       </div>
 
+      {/* Race Settings */}
+      <div className="settings-panel">
+        <h2 className="settings-title">RACE SETTINGS</h2>
+
+        {!isLeader && (
+          <p className="settings-note">Only the leader can change settings.</p>
+        )}
+
+        {/* Language Selector */}
+        <div className="settings-row">
+          <label className="settings-label">LANGUAGE</label>
+          <div className="language-options">
+            {LANGUAGES.map((lang) => (
+              <button
+                key={lang}
+                className={`lang-btn${settings.language === lang ? " active" : ""}${!isLeader ? " disabled-btn" : ""}`}
+                onClick={() => isLeader && updateSettings({ language: lang, level: settings.level })}
+                disabled={!isLeader || updating}
+                title={!isLeader ? "Only the leader can change settings" : ""}
+                style={{ cursor: !isLeader ? "not-allowed" : "pointer" }}
+              >
+                {lang}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Difficulty Selector */}
+        <div className="settings-row">
+          <label className="settings-label">DIFFICULTY</label>
+          <div className="level-options">
+            {LEVEL_INFO.map((info) => (
+              <div
+                key={info.level}
+                className={`level-card${settings.level === info.level ? " active" : ""}${!isLeader ? " disabled-card" : ""}`}
+                onClick={() => isLeader && !updating && updateSettings({ language: settings.language, level: info.level })}
+                title={!isLeader ? "Only the leader can change settings" : ""}
+                style={{ cursor: isLeader ? "pointer" : "not-allowed" }}
+              >
+                <p className="level-num">LVL {info.level}</p>
+                <p className="level-laps">{info.laps} Lap{info.laps > 1 ? "s" : ""}</p>
+                <p className="level-focus">{info.focus}</p>
+                <p className="level-track">{info.track}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Players */}
       <div className="players-grid">
 
@@ -183,7 +277,7 @@ const RoomPage = () => {
           TOGGLE READY
         </button>
 
-        {lobby?.status === "ready" && (
+        {lobby?.status === "ready" && isLeader && (
           <button
             onClick={startRace}
             disabled={updating}
