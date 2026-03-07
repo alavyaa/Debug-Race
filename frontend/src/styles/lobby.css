@@ -73,7 +73,7 @@
   color: #ffffff;
   position: relative;
   z-index: 1;
-  animation: glitch-main 3s infinte;
+  animation: glitch-main 3s ease-out forwards;
 }
 
 /* DEBUG RACE Glitch Animation - Black & White Retro */
@@ -92,12 +92,12 @@
 
 .main-title::before {
   text-shadow: -3px 0 #888888;
-  animation: glitch-top 3s infinte;
+  animation: glitch-top 3s linear forwards;
 }
 
 .main-title::after {
   text-shadow: 3px 0 #444444;
-  animation: glitch-bottom 3s infinte;
+  animation: glitch-bottom 3s linear forwards;
 }
 
 /* Main title shake animation */
@@ -417,8 +417,8 @@
   position: absolute;
   top: 50%;
   left: -80px;
-  width: 85px;
-  height: 60px;
+  width: 70px;
+  height: 45px;
   background: url('../assets/f1-car.png') no-repeat center;
   background-size: contain;
   transform: translateY(-50%);
