@@ -8,7 +8,7 @@ const authenticateUser = async (req, res, next) => {
     let token = req.cookies.token;
 
     // ALSO CHECK AUTH HEADER
-    if (!token && req.headers.authorization) {
+    if (!token && req.headers.authorization?.startsWith("Bearer ")) {
       token = req.headers.authorization.split(" ")[1];
     }
 
