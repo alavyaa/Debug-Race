@@ -1,8 +1,6 @@
 const rooms = new Map();
 const playerStats = new Map();
-const playerMeta = new Map();
-
-const TOTAL_LAPS = 2; // Change karo agar laps dynamic hain
+const playerMeta = new Map(); // FIX: declare playerMeta
 
 module.exports = function(io, socket){
   socket.on('joinRace', ({ raceId, userId, username }) => {
@@ -22,6 +20,7 @@ module.exports = function(io, socket){
       isLeader: true
     }]);
 
+    // FIX: store meta for this player
     playerMeta.set(socket.id, { username, avatar, userId });
 
     io.to(teamCode).emit("roomUpdate",{
@@ -33,7 +32,7 @@ module.exports = function(io, socket){
 
   socket.on("answerSubmitted", ({ teamCode, isCorrect, responseTime, raceId }) => {
     if (!playerStats.has(socket.id)) {
-      playerStats.set(socket.id, { speed: 50, position: 0, lap: 1, streak: 0, socketId: socket.id });
+      playerStats.set(socket.id, { speed: 50, position: 0, lap: 1, streak: 0 });
     }
     const stats = playerStats.get(socket.id);
 
@@ -61,7 +60,7 @@ module.exports = function(io, socket){
 
     playerStats.set(socket.id, stats);
 
-    // Always use real username from playerMeta
+    // FIX: Always use real username from playerMeta (never Unknown)
     const meta = playerMeta.get(socket.id) || {};
     const updatePayload = {
       playerId: socket.id,
@@ -75,39 +74,11 @@ module.exports = function(io, socket){
     if(teamCode){
       socket.to(teamCode).emit('positionUpdate', updatePayload);
     }
-
-    // --- RACE FINISHED AND WINNER LOGIC ---
-    // If all players reached last lap -> race finish
-    // Check all playerStats for lap >= TOTAL_LAPS
-    const allPlayers = Array.from(playerStats.values());
-    const allFinished = allPlayers.length >= 1 && allPlayers.every(p => p.lap >= TOTAL_LAPS);
-
-    if (allFinished) {
-      // Winner: highest speed, customize as needed
-      let winnerPlayer = allPlayers[0];
-      for (const p of allPlayers) {
-        if (p.speed > winnerPlayer.speed) winnerPlayer = p;
-      }
-
-      io.to(teamCode).emit("raceFinished", {
-        winner: playerMeta.get(winnerPlayer.socketId)?.username || "Unknown",
-        players: allPlayers.map((p) => ({
-          username: playerMeta.get(p.socketId)?.username || "Unknown",
-          lap: p.lap,
-          speed: p.speed,
-        })),
-      });
-
-      // Optionally: Reset stats after finish if you want rematch
-      // playerStats.clear();
-      // playerMeta.clear();
-    }
-    // --- END WINNER LOGIC ---
   });
 
   socket.on("disconnect",()=>{
     console.log("Player disconnected:", socket.id);
     playerStats.delete(socket.id);
-    playerMeta.delete(socket.id);
+    playerMeta.delete(socket.id); // FIX: No crash
   });
 };
