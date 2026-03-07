@@ -96,14 +96,14 @@
   left: 2px;
   text-shadow: -2px 0 #ffffff;
   clip-path: inset(0 0 0 0);
-  animation: glitch-top 2.5s infinite linear alternate-reverse;
+  animation: glitch-top 2.5s linear alternate-reverse;
 }
 
 .main-title::after {
   left: -2px;
   text-shadow: 2px 0 #000000;
   clip-path: inset(0 0 0 0);
-  animation: glitch-bottom 3s infinite linear alternate-reverse;
+  animation: glitch-bottom 3s linear alternate-reverse;
 }
 
 @keyframes glitch {
