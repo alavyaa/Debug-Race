@@ -74,23 +74,31 @@ export default function RacePage() {
 
     if (!resolvedUser?.username) return;
 
-    console.log('🏎️ joinRace emit:', resolvedUser.username, raceId);
-
-    socket.emit('joinRace', {
-      raceId,
-      userId: resolvedUser._id,
-      username: resolvedUser.username,
-    });
-
-    const handleReconnect = () => {
+    const emitJoin = () => {
+      console.log('🏎️ joinRace emit:', resolvedUser.username, raceId);
       socket.emit('joinRace', {
         raceId,
         userId: resolvedUser._id,
         username: resolvedUser.username,
       });
     };
-    socket.on('connect', handleReconnect);
-    return () => socket.off('connect', handleReconnect);
+
+    // Pehli baar emit karo
+    emitJoin();
+
+    // ✅ 2 sec baad aur ek baar - dono players sync ho jayein
+    const retry1 = setTimeout(emitJoin, 2000);
+    // ✅ 5 sec baad bhi - late joiners ke liye
+    const retry2 = setTimeout(emitJoin, 5000);
+
+    // Reconnect pe bhi re-emit karo
+    socket.on('connect', emitJoin);
+
+    return () => {
+      clearTimeout(retry1);
+      clearTimeout(retry2);
+      socket.off('connect', emitJoin);
+    };
 
   }, [socket, raceId, state.user?._id, state.user?.username]);
 
