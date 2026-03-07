@@ -12,49 +12,17 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
   const startTimeRef = useRef(Date.now());
   const timerRef = useRef(null);
 
-  // Keep refs in sync with state
+  // Keep selectedAnswerRef in sync with state
   useEffect(() => { selectedAnswerRef.current = selectedAnswer; }, [selectedAnswer]);
 
-  // Reset ALL state when question._id changes (new question)
-  useEffect(() => {
-    isSubmittedRef.current = false;
-    selectedAnswerRef.current = null;
-    startTimeRef.current = Date.now();
-    setSelectedAnswer(null);
-    setTimeLeft(question?.timeLimit || 30);
-    setIsSubmitted(false);
-    setResult(null);
-  }, [question?._id]);
-
-  // Timer — count down independently
-  useEffect(() => {
-    if (isSubmitted) return;
-    if (timerRef.current) clearInterval(timerRef.current);
-
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timerRef.current);
-  }, [isSubmitted, question?._id]);
-
-  // Auto-submit when time runs out
-  useEffect(() => {
-    if (timeLeft === 0 && !isSubmittedRef.current) {
-      handleSubmit(selectedAnswerRef.current);
-    }
-  }, [timeLeft, handleSubmit]);
-
+  // handleSubmit must be declared BEFORE any useEffect that references it
   const handleSubmit = useCallback(async (answer) => {
     if (isSubmittedRef.current) return;
     isSubmittedRef.current = true;
-    clearInterval(timerRef.current);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     setIsSubmitted(true);
 
     const finalAnswer = (answer !== null && answer !== undefined) ? answer : selectedAnswerRef.current;
@@ -63,6 +31,57 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
     const response = await onAnswer(finalAnswer, responseTime);
     if (response) setResult(response);
   }, [onAnswer]);
+
+  // Reset ALL state when question._id changes (new question)
+  useEffect(() => {
+    isSubmittedRef.current = false;
+    selectedAnswerRef.current = null;
+    startTimeRef.current = Date.now();
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setSelectedAnswer(null);
+    setTimeLeft(question?.timeLimit || 30);
+    setIsSubmitted(false);
+    setResult(null);
+  }, [question?._id]);
+
+  // Timer — count down independently
+  useEffect(() => {
+    if (isSubmitted) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [isSubmitted, question?._id]);
+
+  // Auto-submit when time runs out
+  useEffect(() => {
+    if (timeLeft === 0 && !isSubmittedRef.current) {
+      handleSubmit(selectedAnswerRef.current);
+    }
+  }, [timeLeft, handleSubmit]);
 
   const getTimerColor = () => {
     if (timeLeft > 20) return '#00ff88';

@@ -37,6 +37,7 @@ export default function RacePage() {
   const raceDataRef = useRef(null);
   const currentLapRef = useRef(1);
   const answeredIds = useRef(new Set());
+  const playerPositions = useRef({});
 
   // Keep currentLapRef in sync
   useEffect(() => { currentLapRef.current = currentLap; }, [currentLap]);
@@ -217,7 +218,7 @@ export default function RacePage() {
       console.error('Failed to submit answer:', error);
     }
 
-  }, [raceId, currentQuestion, socket, state, dispatch]);
+  }, [raceId, currentQuestion?._id, socket, state.team?.code, state.playerStats.correctAnswers, state.playerStats.totalQuestions, dispatch]);
 
   return (
     <div style={{ minHeight: '100vh', background: '#0d1117', display: 'flex', flexDirection: 'column' }}>
