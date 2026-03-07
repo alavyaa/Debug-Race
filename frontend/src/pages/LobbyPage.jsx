@@ -1,14 +1,16 @@
 import { useAuth } from "../features/auth/features.authContext";
 import api from "../services/api.service";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import "../styles/lobby.css";
 
 const Lobby = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const f1CarRef = useRef(null); // Ref for F1 animation overlay
-
+  const [joinAnimating, setJoinAnimating] = useState(false);
+  const [joinNumbers, setJoinNumbers] = useState([]);
+  
   const handleCreate = async () => {
   // Get the button element and add animating class
   const button = document.querySelector('.primary-action');
@@ -37,6 +39,20 @@ const Lobby = () => {
 };
 
   const handleJoin = async () => {
+  // Generate random numbers for animation
+  const numbers = Array.from({ length: 8 }, (_, i) => ({
+    id: i,
+    value: Math.floor(Math.random() * 10),
+  }));
+  setJoinNumbers(numbers);
+  setJoinAnimating(true);
+
+  // Wait for animation to complete (1.5s)
+  setTimeout(async () => {
+    setJoinAnimating(false);
+    setJoinNumbers([]);
+
+    // Original existing logic below
     const code = prompt("Enter Room Code");
     if (!code) return;
 
@@ -46,7 +62,8 @@ const Lobby = () => {
     } catch (err) {
       alert("Lobby not found");
     }
-  };
+  }, 1500);
+};
 
   const handleLogout = async () => {
     await logout();
@@ -76,9 +93,32 @@ const Lobby = () => {
   <div className="f1-car"></div> {/* F1 car element */}
 </button>
 
-          <button className="secondary-action" onClick={handleJoin}>
-            JOIN LOBBY
-          </button>
+          <button 
+  className={`secondary-action ${joinAnimating ? 'join-animating' : ''}`} 
+  onClick={handleJoin}
+>
+  <span className="join-btn-text">JOIN LOBBY</span>
+  
+  {/* Lock Icon Container */}
+  <div className="join-lock-container">
+    <i className={`fa-solid ${joinAnimating ? 'fa-lock-open' : 'fa-lock'} join-lock-icon`}></i>
+  </div>
+  
+  {/* Floating Numbers */}
+  {joinAnimating && joinNumbers.map((num, index) => (
+    <span 
+      key={num.id} 
+      className="join-number"
+      style={{ 
+        '--delay': `${index * 0.1}s`,
+        '--start-x': `${5 + (index % 4) * 28}%`,
+        '--start-y': index < 4 ? '20%' : '60%',
+      }}
+    >
+      {num.value}
+    </span>
+  ))}
+</button>
         </div>
       </div>
     </div>
