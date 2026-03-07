@@ -148,27 +148,6 @@ Each level has a unique racing track.
 
 ---
 
-# 🚗 Car Types
-
-| Car | Ability |
-|------|------|
-| Speedster | Balanced |
-| TurboX | High boost |
-| StablePro | Low penalty |
-
----
-
-# 🧑‍✈️ Driver Avatars
-
-Players can choose avatars such as:
-
-- Coder Ninja
-- Algorithm Ace
-- Debug Master
-- AI Racer
-- Cyber Mechanic
-
----
 
 # 💻 Supported Languages
 
@@ -318,7 +297,27 @@ Deploy instantly on Railway.
 - Replay system
 - AI coaching assistant
 - Full 3D racing engine
+# 🚗 Car Types
 
+| Car | Ability |
+|------|------|
+| Speedster | Balanced |
+| TurboX | High boost |
+| StablePro | Low penalty |
+
+---
+
+# 🧑‍✈️ Driver Avatars
+
+Players can choose avatars such as:
+
+- Coder Ninja
+- Algorithm Ace
+- Debug Master
+- AI Racer
+- Cyber Mechanic
+
+---
 ---
 
 # ⭐ Support
