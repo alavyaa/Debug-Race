@@ -13,24 +13,40 @@ const RoomPage = () => {
 
   // Fetch lobby data
   const fetchLobby = useCallback(async () => {
-  try {
-    const res = await api.get(`/lobby/${code}`);
+    try {
+      if (!code) return;
 
-    setLobby(res.data);
-    setError(null);
+      const res = await api.get(`/lobby/${code}`);
 
-    // 🔥 IMPORTANT
-    if (res.data.status === "racing" && res.data.currentRace) {
-      navigate(`/race/${res.data.currentRace}`);
-      return;
+      setLobby(res.data);
+      setError(null);
+
+      // 🔥 If race started → redirect to race page
+      if (res.data.status === "racing" && res.data.currentRace) {
+        navigate(`/race/${res.data.currentRace}`);
+        return;
+      }
+
+    } catch (err) {
+      setError("Lobby not found or server error.");
+    } finally {
+      setLoading(false);
     }
+  }, [code, navigate]);
 
-  } catch (err) {
-    setError("Lobby not found or server error.");
-  } finally {
-    setLoading(false);
-  }
-}, [code, navigate]);
+  // 🔥 Poll lobby every 3 seconds
+  useEffect(() => {
+    if (!code) return;
+
+    fetchLobby();
+
+    const interval = setInterval(() => {
+      fetchLobby();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [fetchLobby, code]);
+
   // Toggle ready
   const toggleReady = async () => {
     try {
@@ -48,8 +64,13 @@ const RoomPage = () => {
   const startRace = async () => {
     try {
       setUpdating(true);
+
       const res = await api.post(`/lobby/${code}/start`);
-      navigate(`/race/${res.data.race._id}`);
+
+      if (res.data?.race?._id) {
+        navigate(`/race/${res.data.race._id}`);
+      }
+
     } catch (err) {
       console.error(err);
       alert("Cannot start race.");
