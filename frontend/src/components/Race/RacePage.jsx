@@ -225,7 +225,7 @@ export default function RacePage() {
 
         {/* Left: Race Track (65%) */}
         <div style={{ flex: '0 0 65%', display: 'flex', alignItems: 'stretch', minHeight: 500 }}>
-          <RaceTrack players={positions} currentUserId={socket?.id} />
+          <RaceTrack players={positions} currentUserId={state.user?._id} />
         </div>
 
         {/* Right: Leaderboard + Question Panel (35%) */}
