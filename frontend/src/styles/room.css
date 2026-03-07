@@ -1,274 +1,173 @@
-/* Update Font Import for eSports Feel */
 @import url('https://fonts.googleapis.com/css2?family=Changa:wght@400;700&family=Orbitron:wght@500;800&display=swap');
 
-/* --- Define Gradient Theme (Yellow-Orange) --- */
 :root {
   --neon-orange: #FF6B00;
   --neon-yellow: #FFB800;
-  --bg-dark-black: #050505;
-  --bg-card: #0A0A0A;
-  --text-white: #FFFFFF;
-  --text-grey: #BBBBBB;
-  
-  /* Primary eSports Gradient */
-  --esports-gradient: linear-gradient(135deg, var(--neon-yellow) 0%, var(--neon-orange) 100%);
-  
-  /* Accent Red for Leave (keeps some standard convention) */
-  --accent-red: #ff3b3b;
+  --bg-dark: #050505;
+  --card-bg: rgba(17, 17, 24, 0.9);
+  --esports-gradient: linear-gradient(135deg, #FFB800 0%, #FF6B00 100%);
 }
 
-/* Background */
 .room-container {
   min-height: 100vh;
-  /* Use your custom eSports background image with a dark overlay */
+  /* Dark eSports Background with Overlay */
   background: 
-    linear-gradient(to bottom, rgba(5, 5, 5, 0.9) 0%, rgba(5, 5, 5, 0.7) 100%),
-    url('path-to-your-esports-image.jpg') center/cover no-repeat fixed; /* Replace image path! */
-  color: var(--text-white);
-  /* Changa for main text is more aggressive, Orbitron for headers/titles */
+    linear-gradient(rgba(5, 5, 5, 0.85), rgba(5, 5, 5, 0.95)),
+    url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070'); 
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: white;
   font-family: 'Changa', sans-serif;
-  padding: 50px 7vw; /* Added percentage padding for better scaling */
+  padding: 40px 10%;
 }
 
-/* --- Header Section --- */
+/* Header */
 .room-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; /* Better alignment with larger fonts */
-  margin-bottom: 50px;
+  align-items: center;
+  margin-bottom: 40px;
   border-bottom: 2px solid;
-  border-image: var(--esports-gradient) 1; /* Underline uses the gradient */
-  padding-bottom: 15px;
+  border-image: var(--esports-gradient) 1;
+  padding-bottom: 20px;
 }
 
 .room-title {
-  font-family: 'Orbitron', sans-serif; /* Keep title on Orbitron */
-  font-weight: 800;
-  font-size: 38px; /* Slightly larger */
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 32px;
+  letter-spacing: 2px;
 }
 
 .room-title span {
-  color: var(--neon-orange); /* Or keep it orange, but let's try the lobby code for the bright accent */
-}
-
-/* Use Lobby Code as the main eSports focus element in the header */
-.room-title strong { /* Assuming your HTML might structure the code slightly differently, or target by content if needed */
-  font-size: 1.2em; /* Emphasize the code */
-}
-
-/* Specific styling for the actual code part of the title */
-.lobby-code-display { /* This might require adding a class to your HTML, e.g., <h1 class="room-title">LOBBY CODE: <span class="lobby-code-display">796742</span></h1> */
   color: var(--neon-yellow);
-  text-shadow: 0 0 10px rgba(255, 184, 0, 0.7); /* Subtle neon glow */
+  text-shadow: 0 0 15px rgba(255, 184, 0, 0.5);
 }
 
-/* Leave Button */
 .leave-btn {
-  padding: 10px 18px;
-  font-size: 14px;
+  padding: 10px 20px;
   background: transparent;
-  border: 1px solid var(--accent-red);
-  color: var(--accent-red);
+  border: 1px solid #ff3b3b;
+  color: #ff3b3b;
   cursor: pointer;
-  letter-spacing: 2px;
-  text-transform: uppercase;
   font-family: 'Orbitron', sans-serif;
-  transition: 0.3s ease;
-  transform: skewX(-10deg); /* Skew for eSports angular feel */
+  transition: 0.3s;
+  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); /* Angular eSports cut */
 }
 
 .leave-btn:hover {
-  background: var(--accent-red);
-  color: black;
-  transform: skewX(-10deg) scale(1.05); /* Slight push-out on hover */
+  background: #ff3b3b;
+  color: white;
 }
 
-/* --- Lobby Status --- */
+/* Status Section */
 .room-status {
   margin-bottom: 40px;
-  background-color: rgba(255, 255, 255, 0.03); /* Subtle backdrop */
-  padding: 15px 25px;
-  border-left: 3px solid;
-  border-image: var(--esports-gradient) 1;
+  display: flex;
+  gap: 40px;
 }
 
 .room-status p {
-  margin-bottom: 8px;
+  font-size: 18px;
   letter-spacing: 1px;
-  color: var(--text-white);
-  display: flex; /* Aligns label and value nicely */
-  justify-content: space-between;
-  width: fit-content;
-}
-
-/* Style for labels (e.g., STATUS:, LEADER:) */
-.room-status p strong { 
-    color: var(--text-grey);
-    margin-right: 15px;
-    font-size: 0.9em;
-}
-
-.status {
-  color: var(--neon-yellow); /* Yellow for 'waiting' fits 'ready' state logic */
   font-weight: bold;
 }
 
-.leader {
-  color: var(--neon-orange); /* Use Orange as the main identity color */
-  font-weight: bold;
-}
+.status { color: var(--neon-yellow); text-transform: uppercase; }
+.leader { color: var(--neon-orange); }
 
-/* --- Players Grid & Cards --- */
+/* Players Grid */
 .players-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Increased min-width for larger cards */
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
 }
 
-/* Player Card */
 .player-card {
-  padding: 25px; /* Increased padding */
-  border: none;
-  background-color: var(--bg-card);
+  padding: 25px;
+  background: var(--card-bg);
+  border-left: 4px solid var(--neon-orange);
   border-radius: 4px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Add depth */
-  transition: all 0.3s ease;
-  display: flex;
-  justify-content: space-between; /* Put indicator at the end */
-  align-items: center;
-  position: relative; /* For top bar effect */
-}
-
-/* Top accent bar on each card, using the theme gradient */
-.player-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: var(--esports-gradient);
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
 }
 
 .player-card:hover {
-  border-color: transparent; /* No longer border-based hover */
-  transform: translateY(-5px) scale(1.02); /* More aggressive movement */
-  box-shadow: 0 8px 15px rgba(255, 107, 0, 0.2); /* Orange-tinted shadow glow */
-}
-
-/* Group player info together (left side) */
-.player-info { /* New wrapper in HTML would be good, but we can structure inside this .player-card if needed */
-    display: flex;
-    flex-direction: column;
+  transform: translateY(-5px);
+  background: rgba(30, 30, 40, 0.95);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
 }
 
 .player-name {
   font-family: 'Orbitron', sans-serif;
   font-size: 20px;
-  letter-spacing: 1px;
-  color: var(--text-white);
-  margin-bottom: 5px;
+  margin: 0;
 }
 
 .player-status {
-  font-family: 'Changa', sans-serif;
   font-size: 14px;
-  color: var(--text-grey);
-  letter-spacing: 1px;
+  color: #888;
+  margin-top: 5px;
 }
 
-/* Ready Indicator */
+/* Indicators */
 .ready-indicator {
-  width: 14px; /* Slightly larger */
-  height: 14px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
-  box-shadow: 0 0 10px; /* Base shadow for glow effect */
 }
 
-.ready {
-  background: var(--neon-yellow); /* Matching 'ready' to the bright color */
-  box-shadow: 0 0 10px rgba(255, 184, 0, 0.8);
+.ready { 
+  background: var(--neon-yellow); 
+  box-shadow: 0 0 15px var(--neon-yellow);
 }
 
-.not-ready {
-  background: var(--accent-red); /* Keep not-ready red for visibility */
-  box-shadow: 0 0 10px rgba(255, 59, 59, 0.8);
+.not-ready { 
+  background: #ff3b3b; 
+  box-shadow: 0 0 15px #ff3b3b;
 }
 
-/* --- Controls Section --- */
+/* Buttons */
 .room-controls {
-  margin-top: 60px; /* Increased top margin */
+  margin-top: 50px;
   display: flex;
-  gap: 25px;
-  justify-content: center; /* Center buttons for strong presence */
+  gap: 20px;
 }
 
-/* Buttons Base with eSports Styling */
 .room-btn {
-  padding: 16px 35px;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  cursor: pointer;
-  background: transparent;
-  border: 2px solid;
-  border-radius: 4px;
+  padding: 15px 40px;
   font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
   text-transform: uppercase;
-  transition: all 0.3s ease;
-  position: relative; /* for fill animation */
-  overflow: hidden; /* for fill animation */
+  border: none;
 }
 
-/* Ready Button - Uses Gradient Outline, Solid Fill on Hover */
 .ready-btn {
-  border-color: transparent; /* No solid border, uses pseudo element */
+  background: transparent;
+  border: 2px solid var(--neon-yellow);
   color: var(--neon-yellow);
 }
 
-/* Pseudo element to create the gradient outline */
-.ready-btn::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    border-radius: 2px; /* Slight inset for better effect */
-    padding: 2px; /* Outline thickness */
-    background: var(--esports-gradient);
-    -webkit-mask: 
-       linear-gradient(#fff 0 0) content-box, 
-       linear-gradient(#fff 0 0);
-    -webkit-mask-composite: destination-out;
-    mask-composite: exclude;
-}
-
 .ready-btn:hover {
-  background: var(--esports-gradient); /* Solid gradient fill on hover */
+  background: var(--neon-yellow);
   color: black;
-  box-shadow: 0 5px 15px rgba(255, 184, 0, 0.4);
 }
 
-/* Start Race Button - More Solid/Primary for the Action */
 .start-btn {
   background: var(--esports-gradient);
-  border-color: transparent;
-  color: black; /* Solid black text for contrast */
+  color: black;
+  box-shadow: 0 0 20px rgba(255, 107, 0, 0.4);
 }
 
 .start-btn:hover {
-  background: linear-gradient(135deg, var(--neon-orange) 0%, var(--neon-yellow) 100%); /* Reversed gradient or brighter on hover */
-  transform: scale(1.05); /* Make the main action button pulsate slightly on hover */
-  box-shadow: 0 5px 20px rgba(255, 107, 0, 0.5);
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(255, 107, 0, 0.6);
 }
 
-/* Adjustments for smaller screens (minimal for now) */
-@media (max-width: 600px) {
-    .room-container { padding: 30px 4vw; }
-    .room-header { flex-direction: column; align-items: center; text-align: center; }
-    .room-title { font-size: 28px; margin-bottom: 20px; }
-    .leave-btn { position: absolute; top: 10px; right: 10px; } /* Optional placement */
-}
+/* Flex helper for card layout */
+.flex { display: flex; }
+.justify-between { justify-content: space-between; }
+.items-center { align-items: center; }
