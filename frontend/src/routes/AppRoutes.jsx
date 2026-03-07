@@ -63,14 +63,6 @@ const AppRoutes = () => {
         }
       />
 
-      <Route
-        path="/results/:raceId"
-        element={
-          <ProtectedRoute>
-            <RaceEndPage />
-          </ProtectedRoute>
-        }
-      />
 
       <Route path="*" element={<Navigate to="/" />} />
 
