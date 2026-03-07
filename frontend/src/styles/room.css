@@ -304,3 +304,23 @@
   margin: 0;
 }
 
+/* Page slider (scrollbar) */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--neon-yellow);
+  border-radius: 6px;
+  border: 3px solid rgba(0, 0, 0, 0.2);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-yellow) rgba(0, 0, 0, 0.2);
+}
