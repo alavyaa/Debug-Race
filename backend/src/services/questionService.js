@@ -34,7 +34,7 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
         /**
          * Generate new AI question if cache empty
          */
-        if (!question || Math.random() > 0.7) {
+        if (true) {
 
           console.log("🤖 Generating new AI question...");
 
