@@ -1,17 +1,20 @@
 const rooms = new Map();
 const playerStats = new Map();
-const playerMeta = new Map(); // FIX: declare playerMeta
+const playerMeta = new Map();
 
 module.exports = function(io, socket){
+
+  // ✅ FIX 1: joinRace mein username aur raceId store karo
   socket.on('joinRace', ({ raceId, userId, username }) => {
-    // Optional: Add join logic
+    if (raceId) socket.join(raceId); // player ko raceId room mein daalo
+    playerMeta.set(socket.id, { username, userId, raceId });
+    console.log(`Player joined: ${username} | race: ${raceId} | socket: ${socket.id}`);
   });
 
   socket.on("createRoom", data => {
     const { teamCode, userId, username, avatar } = data;
     socket.join(teamCode);
-
-    rooms.set(teamCode,[{
+    rooms.set(teamCode, [{
       id: userId,
       socketId: socket.id,
       username,
@@ -19,14 +22,11 @@ module.exports = function(io, socket){
       isReady: false,
       isLeader: true
     }]);
-
-    // FIX: store meta for this player
     playerMeta.set(socket.id, { username, avatar, userId });
-
-    io.to(teamCode).emit("roomUpdate",{
-      code:teamCode,
-      players:rooms.get(teamCode),
-      status:"waiting"
+    io.to(teamCode).emit("roomUpdate", {
+      code: teamCode,
+      players: rooms.get(teamCode),
+      status: "waiting"
     });
   });
 
@@ -34,6 +34,7 @@ module.exports = function(io, socket){
     if (!playerStats.has(socket.id)) {
       playerStats.set(socket.id, { speed: 50, position: 0, lap: 1, streak: 0 });
     }
+
     const stats = playerStats.get(socket.id);
 
     if (isCorrect) {
@@ -47,12 +48,12 @@ module.exports = function(io, socket){
     stats.speed = Math.max(10, Math.min(150, stats.speed + speedDelta));
 
     if (isCorrect) {
-      stats.position += 1/3;
-      if(stats.position >= 1){
+      stats.position += 1 / 3;
+      if (stats.position >= 1) {
         stats.position -= 1;
         stats.lap += 1;
         socket.emit('lapComplete', { playerId: socket.id, lap: stats.lap - 1 });
-        if(teamCode){
+        if (teamCode) {
           socket.to(teamCode).emit('lapComplete', { playerId: socket.id, lap: stats.lap - 1 });
         }
       }
@@ -60,25 +61,43 @@ module.exports = function(io, socket){
 
     playerStats.set(socket.id, stats);
 
-    // FIX: Always use real username from playerMeta (never Unknown)
+    // ✅ FIX 2: meta se username lo (joinRace mein store hua)
     const meta = playerMeta.get(socket.id) || {};
+    const resolvedRaceId = raceId || meta.raceId;
+
     const updatePayload = {
       playerId: socket.id,
-      username: meta.username || "Unknown",
+      username: meta.username || `Player ${socket.id.slice(-4)}`, // "Unknown" hata diya
       avatar: meta.avatar || "",
       lap: stats.lap,
       position: stats.position,
       speed: stats.speed,
     };
+
+    // Apne aap ko bhi update karo
     socket.emit('positionUpdate', updatePayload);
-    if(teamCode){
+
+    // ✅ FIX 3: raceId room mein emit karo - sabko milega update
+    if (resolvedRaceId) {
+      socket.to(resolvedRaceId).emit('positionUpdate', updatePayload);
+    }
+
+    // Purana teamCode wala bhi rakha (backward compat)
+    if (teamCode) {
       socket.to(teamCode).emit('positionUpdate', updatePayload);
     }
+
+    // Speed update bhi emit karo
+    socket.emit('speedUpdate', {
+      playerId: socket.id,
+      speed: stats.speed,
+      streak: stats.streak
+    });
   });
 
-  socket.on("disconnect",()=>{
+  socket.on("disconnect", () => {
     console.log("Player disconnected:", socket.id);
     playerStats.delete(socket.id);
-    playerMeta.delete(socket.id); // FIX: No crash
+    playerMeta.delete(socket.id);
   });
 };
