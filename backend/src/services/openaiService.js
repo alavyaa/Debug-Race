@@ -3,11 +3,13 @@ const OpenAI = require("openai");
 /**
  * OpenRouter configuration
  */
+const OpenAI = require("openai");
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   baseURL: "https://openrouter.ai/api/v1",
   defaultHeaders: {
-    "HTTP-Referer": "https://debug-race.app",
+    "HTTP-Referer": "https://debug-race-ztam.onrender.com",
     "X-Title": "Debug Race"
   }
 });
@@ -83,15 +85,25 @@ Do NOT include markdown.
       `🤖 Generating ${type} question | ${language} | Level ${difficulty} | Focus ${skillFocus}`
     );
 
-    const completion = await openai.chat.completions.create({
-      model: "mistralai/mistral-small",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: "Generate the question." }
-      ],
-      temperature: 0.7,
-      max_tokens: 800
-    });
+   const completion = await openai.chat.completions.create({
+  model: "mistralai/devstral-2512:free",
+  messages: [
+    { role: "system", content: systemPrompt },
+    { role: "user", content: "Generate the question." }
+  ],
+  temperature: 0.7,
+  max_tokens: 800
+});
+
+if (!completion || !completion.choices || completion.choices.length === 0) {
+  throw new Error("Invalid response from OpenRouter");
+}
+
+const content = completion.choices[0]?.message?.content;
+
+if (!content) {
+  throw new Error("Empty AI response");
+}
 
     /**
      * Safety check for API response
