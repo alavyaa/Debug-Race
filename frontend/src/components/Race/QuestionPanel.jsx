@@ -6,6 +6,12 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [result, setResult] = useState(null);
 
+  // Normalize options to always be { id, text } objects
+  const options = (question?.options || []).map((opt, i) => ({
+    id: typeof opt === 'object' && opt.id ? opt.id : String.fromCharCode(65 + i),
+    text: typeof opt === 'object' ? (opt.text || String(opt)) : String(opt),
+  }));
+
   // Refs to avoid stale closures
   const isSubmittedRef = useRef(false);
   const selectedAnswerRef = useRef(null);
@@ -89,23 +95,15 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
     return '#ff4444';
   };
 
-  const getOptionClass = (option) => {
+  const getOptionStyle = (optId) => {
+    const base = 'w-full text-left p-3 rounded-lg border transition-all mb-2 text-sm ';
     if (isSubmitted && result) {
-      const isCorrectOption = option.id === result.correctAnswer;
-      const isMyWrongAnswer = option.id === selectedAnswer && !result.isCorrect;
-
-      if (isCorrectOption) {
-        return 'border-neon-green bg-neon-green/20 text-neon-green';
-      } else if (isMyWrongAnswer) {
-        return 'border-red-500 bg-red-500/20 text-red-500';
-      } else {
-        return 'border-gray-600 text-gray-400';
-      }
+      if (optId === result.correctAnswer) return base + 'border-green-500 bg-green-500/20 text-green-300';
+      if (optId === selectedAnswer && !result.isCorrect) return base + 'border-red-500 bg-red-500/20 text-red-300';
+      return base + 'border-gray-700 bg-gray-900/30 text-gray-500';
     }
-    if (selectedAnswer === option.id) {
-      return 'border-neon-blue bg-neon-blue/20 text-white';
-    }
-    return 'border-gray-600 hover:border-neon-blue/50 text-gray-300';
+    if (selectedAnswer === optId) return base + 'border-blue-400 bg-blue-400/20 text-white';
+    return base + 'border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-400 cursor-pointer';
   };
 
   return (
@@ -161,15 +159,15 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
 
       {/* Options */}
       <div className="space-y-3 mb-4">
-        {question?.options?.map((option) => (
+        {options.map((opt) => (
           <button
-            key={option.id}
-            onClick={() => !isSubmitted && setSelectedAnswer(option.id)}
+            key={opt.id}
+            onClick={() => !isSubmitted && setSelectedAnswer(opt.id)}
             disabled={isSubmitted}
-            className={`w-full p-4 rounded-lg border-2 text-left transition-all ${getOptionClass(option)}`}
+            className={getOptionStyle(opt.id)}
           >
-            <span className="font-racing mr-3">{option.id}.</span>
-            <span className="font-body">{option.text}</span>
+            <span className="font-racing mr-3">{opt.id}.</span>
+            <span className="font-body">{opt.text}</span>
           </button>
         ))}
       </div>
