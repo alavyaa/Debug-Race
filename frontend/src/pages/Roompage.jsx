@@ -79,15 +79,9 @@ const RoomPage = () => {
   };
 
   // Leave lobby (FIXED)
-  const leaveLobby = async () => {
-    navigate("/lobby"); // instantly leave room
-
-    try {
-      await api.delete(`/lobby/${code}`); // optional backend cleanup
-    } catch (err) {
-      console.error("Leave lobby error:", err);
-    }
-  };
+ const leaveLobby = () => {
+  navigate("/lobby");
+};
 
   if (loading) {
     return (
