@@ -206,7 +206,7 @@ async function startRaceController(req, res) {
         message: "All players must be ready",
       });
     }
-    if (lobby.members.length < 1) {
+    if (lobby.members.length < 2) {
       return res.status(400).json({
         message: "At least 1 player required",
       });
