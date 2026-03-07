@@ -61,6 +61,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };
