@@ -1,5 +1,6 @@
 const rooms = new Map();
 const playerStats = new Map(); // socket.id -> { speed, position, lap, streak }
+const playerMeta = new Map(); // socket.id -> { username, avatar, userId }
 module.exports = function(io, socket){
 
   socket.on('joinRace', ({ raceId, userId, username }) => {
@@ -18,6 +19,8 @@ module.exports = function(io, socket){
       isReady:false,
       isLeader:true
     }]);
+
+    playerMeta.set(socket.id, { username, avatar, userId });
 
     io.to(teamCode).emit("roomUpdate",{
       code:teamCode,
