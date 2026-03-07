@@ -171,3 +171,136 @@
 .flex { display: flex; }
 .justify-between { justify-content: space-between; }
 .items-center { align-items: center; }
+
+/* Race Settings Panel */
+.settings-panel {
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 184, 0, 0.2);
+  border-radius: 4px;
+  padding: 30px;
+  margin-bottom: 40px;
+}
+
+.settings-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: var(--neon-yellow);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.settings-note {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.settings-row {
+  margin-bottom: 24px;
+}
+
+.settings-label {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: #aaa;
+  margin-bottom: 12px;
+}
+
+/* Language buttons */
+.language-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.lang-btn {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 184, 0, 0.3);
+  color: #ccc;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+  border-radius: 2px;
+}
+
+.lang-btn:hover:not(:disabled) {
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+}
+
+.lang-btn.active {
+  background: var(--esports-gradient);
+  border-color: transparent;
+  color: black;
+  font-weight: bold;
+}
+
+.lang-btn.disabled-btn,
+.lang-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Level cards */
+.level-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.level-card {
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255, 184, 0, 0.2);
+  border-radius: 4px;
+  min-width: 110px;
+  transition: 0.2s;
+  user-select: none;
+}
+
+.level-card:hover:not(.disabled-card) {
+  border-color: var(--neon-yellow);
+  background: rgba(255, 184, 0, 0.05);
+}
+
+.level-card.active {
+  border-color: var(--neon-orange);
+  background: rgba(255, 107, 0, 0.1);
+  box-shadow: 0 0 12px rgba(255, 107, 0, 0.2);
+}
+
+.level-card.disabled-card {
+  opacity: 0.6;
+}
+
+.level-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 15px;
+  color: var(--neon-yellow);
+  margin: 0 0 6px 0;
+}
+
+.level-laps {
+  font-size: 12px;
+  color: #bbb;
+  margin: 0 0 4px 0;
+}
+
+.level-focus {
+  font-size: 12px;
+  color: var(--neon-orange);
+  margin: 0 0 4px 0;
+}
+
+.level-track {
+  font-size: 11px;
+  color: #888;
+  margin: 0;
+}
+
