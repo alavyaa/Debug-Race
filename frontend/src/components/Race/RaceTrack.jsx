@@ -120,9 +120,10 @@ export default function RaceTrack({ players = [], currentUserId }) {
       // position 0→1 maps to angle 0→2π, starting at bottom (π/2) going clockwise
       const startAngle = Math.PI / 2;
       const angle = startAngle + (player.position || 0) * Math.PI * 2;
-      const pt = getTrackPoint(angle, cx, cy, rx, ry);
+      const laneOffset = idx * 6;
+      const pt = getTrackPoint(angle, cx, cy, rx - laneOffset, ry - laneOffset);
 
-      const radius = isMe ? 16 : 12;
+      const radius = isMe ? 10 : 8;
 
       // Glow for current user
       if (isMe) {
@@ -148,9 +149,9 @@ export default function RaceTrack({ players = [], currentUserId }) {
       ctx.restore();
 
       // Initials / number inside dot
-      const label = player.username
-        ? player.username.slice(0, 2).toUpperCase()
-        : String(idx + 1);
+      const label = (player.username || 'P' + (idx + 1))
+          .slice(0, 2)
+          .toUpperCase();
       ctx.save();
       ctx.fillStyle = '#000000';
       ctx.font = `bold ${isMe ? 10 : 8}px monospace`;
@@ -168,10 +169,10 @@ export default function RaceTrack({ players = [], currentUserId }) {
       ctx.shadowColor = '#000';
       ctx.shadowBlur = 4;
       ctx.fillText(
-        (player.username || `P${idx + 1}`) + (isMe ? ' ★' : ''),
-        pt.x,
-        pt.y - radius - 3,
-      );
+         (player.username || `Player${idx + 1}`) + (isMe ? ' ★' : ''),
+         pt.x,
+         pt.y - radius - 4,
+     );
       ctx.restore();
     });
   }, [players, currentUserId]);
