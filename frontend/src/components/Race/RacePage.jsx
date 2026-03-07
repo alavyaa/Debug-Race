@@ -92,14 +92,29 @@ export default function RacePage() {
     });
 
     socket.on('positionUpdate', ({ playerId, position, lap, speed, username }) => {
-      setPositions(prev => {
-        const existing = prev.find(p => p.playerId === playerId);
-        const color = existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
-        const displayName = existing?.username || username || `Player ${playerId?.slice(-4)}`;
-        const updated = prev.filter(p => p.playerId !== playerId);
-        updated.push({ playerId, position, lap, speed, color, username: displayName });
-      });
+  setPositions(prev => {
+    const existing = prev.find(p => p.playerId === playerId);
+
+    const color =
+      existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
+
+    const displayName =
+      existing?.username || username || `Player ${playerId?.slice(-4)}`;
+
+    const updated = prev.filter(p => p.playerId !== playerId);
+
+    updated.push({
+      playerId,
+      position,
+      lap,
+      speed,
+      color,
+      username: displayName
     });
+
+    return updated;   // ⭐ THIS WAS MISSING
+  });
+});
 
     socket.on('lapComplete', ({ lap }) => {
       const nextLap = lap + 1;
