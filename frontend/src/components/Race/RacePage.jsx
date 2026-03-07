@@ -60,39 +60,14 @@ export default function RacePage() {
     fetchRace();
   }, [raceId]);
 
-  // ✅ FIX 1: localStorage se directly username lo - state async hoti hai
+  // ✅ FIX 1: username ready hone ka wait karo phir joinRace emit karo
   useEffect(() => {
-    if (!socket || !raceId) return;
-
-    let resolvedUser = state.user;
-    if (!resolvedUser) {
-      try {
-        const saved = localStorage.getItem('debugrace_user');
-        if (saved) resolvedUser = JSON.parse(saved);
-      } catch(e) {}
-    }
-
-    if (!resolvedUser?.username) return;
-
-    console.log('🏎️ joinRace emit:', resolvedUser.username, raceId);
-
+    if (!socket || !raceId || !state.user?.username) return;
     socket.emit('joinRace', {
       raceId,
-      userId: resolvedUser._id,
-      username: resolvedUser.username,
+      userId: state.user?._id,
+      username: state.user?.username,
     });
-
-    // Reconnect pe bhi re-emit karo
-    const handleReconnect = () => {
-      socket.emit('joinRace', {
-        raceId,
-        userId: resolvedUser._id,
-        username: resolvedUser.username,
-      });
-    };
-    socket.on('connect', handleReconnect);
-    return () => socket.off('connect', handleReconnect);
-
   }, [socket, raceId, state.user?._id, state.user?.username]);
 
   // Socket event listeners
@@ -111,7 +86,7 @@ export default function RacePage() {
         const existing = prev.find(p => p.playerId === playerId);
         const color = existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
 
-        // ✅ FIX 2: server se aaya username PEHLE lo
+        // ✅ FIX 2: server se aaya username PEHLE lo - existing ignore karo
         const displayName =
           username ||
           (playerId === socket.id ? state.user?.username : null) ||
@@ -170,7 +145,7 @@ export default function RacePage() {
 
       const { isCorrect, streak } = response.data;
 
-      // ✅ FIX 3: teamCode ki jagah raceId bhejo - state.team?.code NULL hota hai
+      // ✅ FIX 3: teamCode ki jagah raceId bhejo - teamCode null hota hai
       socket?.emit('answerSubmitted', {
         teamCode: raceId,
         isCorrect,
