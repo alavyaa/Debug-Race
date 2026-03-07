@@ -75,7 +75,7 @@
   -webkit-text-fill-color: transparent;
   /* DEBUG RACE Glitch Animation */
   position: relative;
-  animation: glitch 3s infinite;
+  animation: glitch 4s;
 }
 
 /* DEBUG RACE Glitch Animation - Black & White Retro */
