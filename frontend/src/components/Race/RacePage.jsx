@@ -37,7 +37,6 @@ export default function RacePage() {
   const raceDataRef = useRef(null);
   const currentLapRef = useRef(1);
   const answeredIds = useRef(new Set());
-  const playerPositions = useRef({});
 
   // Keep currentLapRef in sync
   useEffect(() => { currentLapRef.current = currentLap; }, [currentLap]);
@@ -58,18 +57,12 @@ export default function RacePage() {
           setShowQuestion(true);
         }
 
-        // Build initial positions — race populates players[].user as { _id, username, avatar }
-        if (raceResp.players?.length > 0) {
-          const initialPositions = raceResp.players.map((p, idx) => ({
-            playerId: p.user?._id?.toString() || p._id?.toString(),
-            username: p.user?.username || `Player ${idx + 1}`,
-            position: 0,
-            lap: 1,
-            speed: 0,
-            color: PLAYER_COLORS[idx % PLAYER_COLORS.length],
-          }));
-          setPositions(initialPositions);
-        }
+        // Emit joinRace so backend can map socket.id -> userId/username
+        socket?.emit('joinRace', {
+          raceId,
+          userId: state.user?._id,
+          username: state.user?.username || 'Unknown',
+        });
 
       } catch (error) {
         console.error('Failed to fetch race:', error);
@@ -78,7 +71,7 @@ export default function RacePage() {
     };
 
     fetchRace();
-  }, [raceId, dispatch, navigate]);
+  }, [raceId, dispatch, navigate, socket, state.user]);
 
   // Socket event listeners
   useEffect(() => {
@@ -94,34 +87,13 @@ export default function RacePage() {
       }
     });
 
-    socket.on('positionUpdate', ({ playerId, position, lap, speed }) => {
-      // Accumulate position deltas
-      if (!playerPositions.current[playerId]) {
-        playerPositions.current[playerId] = { position: 0, lap: 1 };
-      }
-      playerPositions.current[playerId].position =
-        (playerPositions.current[playerId].position + (position || 0)) % 1;
-      playerPositions.current[playerId].lap = lap;
-
+    socket.on('positionUpdate', ({ playerId, position, lap, speed, username }) => {
       setPositions(prev => {
         const existing = prev.find(p => p.playerId === playerId);
         const color = existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
-        const username = existing?.username ||
-          raceDataRef.current?.players?.find(p =>
-            (p.user?._id || p.user)?.toString() === playerId
-          )?.user?.username ||
-          `Player ${playerId?.slice(-4)}`;
-
+        const displayName = existing?.username || username || `Player ${playerId?.slice(-4)}`;
         const updated = prev.filter(p => p.playerId !== playerId);
-        updated.push({
-          playerId,
-          position: playerPositions.current[playerId].position,
-          lap,
-          speed,
-          color,
-          username
-        });
-
+        updated.push({ playerId, position, lap, speed, color, username: displayName });
         return updated.sort((a, b) => {
           if (a.lap !== b.lap) return b.lap - a.lap;
           return b.position - a.position;

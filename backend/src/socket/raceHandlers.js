@@ -1,7 +1,14 @@
 const rooms = new Map();
 const playerStats = new Map(); // socket.id -> { speed, position, lap, streak }
+const playerMeta = new Map(); // socket.id -> { userId, username, raceId }
 
 module.exports = function(io, socket){
+
+  socket.on('joinRace', ({ raceId, userId, username }) => {
+    playerMeta.set(socket.id, { userId, username, raceId });
+    socket.join(raceId);
+    console.log(`Player ${username} (${socket.id}) joined race ${raceId}`);
+  });
 
   socket.on("createRoom", data => {
     const { teamCode, userId, username, avatar } = data;
@@ -74,8 +81,10 @@ module.exports = function(io, socket){
     });
 
     // Emit positionUpdate to everyone in the room
+    const meta = playerMeta.get(socket.id) || {};
     const updatePayload = {
       playerId: socket.id,
+      username: meta.username || 'Unknown',
       position: stats.position,
       lap: stats.lap,
       speed: stats.speed,
@@ -89,6 +98,7 @@ module.exports = function(io, socket){
   socket.on("disconnect",()=>{
     console.log("Player disconnected:", socket.id);
     playerStats.delete(socket.id);
+    playerMeta.delete(socket.id);
   });
 
 };
