@@ -4,7 +4,6 @@
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/Hamzaul/Debug-Race?style=for-the-badge)
 ![GitHub forks](https://img.shields.io/github/forks/Hamzaul/Debug-Race?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/Hamzaul/Debug-Race?style=for-the-badge)
 ![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge)
 ![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Database-green?style=for-the-badge)
