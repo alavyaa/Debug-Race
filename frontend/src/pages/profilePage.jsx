@@ -50,11 +50,11 @@ const Profile = () => {
         >
 
           {/* Avatar */}
-         <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center" }}>
   <img
     src={
       user?.avatar ||
-      'https://api.dicebear.com/7.x/adventurer/svg?seed=username'
+      `https://api.dicebear.com/7.x/adventurer/svg?seed=${user?.username}`
     }
     alt="avatar"
     style={{
