@@ -3,12 +3,18 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider } from "./features/auth/features.authContext";
+import { GameProvider } from "./context/GameContext";
+import { SocketProvider } from "./context/SocketContext";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>
-      <App />
+      <GameProvider>
+        <SocketProvider>
+          <App />
+        </SocketProvider>
+      </GameProvider>
     </AuthProvider>
   </BrowserRouter>
 );
