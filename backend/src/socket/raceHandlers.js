@@ -1,24 +1,17 @@
 const rooms = new Map();
 const playerStats = new Map();
 const playerMeta = new Map();
-const raceFinishOrder = new Map(); // raceId -> [socketId, ...]
 
 module.exports = function(io, socket){
 
-  socket.on('joinRace', ({ raceId, userId, username, totalLaps }) => {
+  socket.on('joinRace', ({ raceId, userId, username }) => {
     if (raceId) socket.join(raceId);
 
+    // ✅ FIX 1: auth fallback se bhi username lo
     const resolvedUsername = username || socket.handshake.auth?.username || `Player ${socket.id.slice(-4)}`;
     const resolvedUserId = userId || socket.handshake.auth?.userId;
 
-    // totalLaps bhi store karo
-    playerMeta.set(socket.id, {
-      username: resolvedUsername,
-      userId: resolvedUserId,
-      raceId,
-      totalLaps: totalLaps || 2
-    });
-
+    playerMeta.set(socket.id, { username: resolvedUsername, userId: resolvedUserId, raceId });
     console.log(`Player joined: ${resolvedUsername} | race: ${raceId} | socket: ${socket.id}`);
 
     // Naye player ko existing players ka data bhejo
@@ -58,13 +51,10 @@ module.exports = function(io, socket){
 
   socket.on("answerSubmitted", ({ teamCode, isCorrect, responseTime, raceId }) => {
     if (!playerStats.has(socket.id)) {
-      playerStats.set(socket.id, { speed: 50, position: 0, lap: 1, streak: 0, finished: false });
+      playerStats.set(socket.id, { speed: 50, position: 0, lap: 1, streak: 0 });
     }
 
     const stats = playerStats.get(socket.id);
-
-    // Agar player already finish kar chuka hai toh ignore karo
-    if (stats.finished) return;
 
     if (isCorrect) {
       stats.streak = (stats.streak || 0) + 1;
@@ -77,55 +67,16 @@ module.exports = function(io, socket){
     stats.speed = Math.max(10, Math.min(150, stats.speed + speedDelta));
 
     const meta = playerMeta.get(socket.id) || {};
+    // ✅ FIX 2: raceId pehle lo, teamCode fallback
     const resolvedRaceId = raceId || meta.raceId || teamCode;
-    const totalLaps = meta.totalLaps || 2; // ✅ meta se totalLaps lo
 
     if (isCorrect) {
       stats.position += 1 / 3;
-
       if (stats.position >= 1) {
         stats.position -= 1;
         stats.lap += 1;
-
-        // ✅ FIX: Last lap complete hone ke baad raceFinished emit karo
-        if (stats.lap > totalLaps) {
-          stats.finished = true;
-          playerStats.set(socket.id, stats);
-
-          // Finish order track karo
-          if (!raceFinishOrder.has(resolvedRaceId)) {
-            raceFinishOrder.set(resolvedRaceId, []);
-          }
-          const finishList = raceFinishOrder.get(resolvedRaceId);
-          finishList.push(socket.id);
-          const rank = finishList.length;
-
-          console.log(`Player finished: ${meta.username} | rank: ${rank} | race: ${resolvedRaceId}`);
-
-          // Is player ko bata do wo finish ho gaya
-          socket.emit('playerFinished', { playerId: socket.id, rank });
-
-          // Sabko bata do ye player finish hua
-          if (resolvedRaceId) {
-            socket.to(resolvedRaceId).emit('playerFinished', { playerId: socket.id, rank });
-          }
-
-          // ✅ Sabko raceFinished emit karo - results page pe jaayenge
-          if (resolvedRaceId) {
-            io.to(resolvedRaceId).emit('raceFinished', {
-              winnerId: socket.id,
-              winnerName: meta.username,
-              finishOrder: finishList
-            });
-          }
-
-          // Cleanup
-          raceFinishOrder.delete(resolvedRaceId);
-          return;
-        }
-
-        // Normal lap complete
         socket.emit('lapComplete', { playerId: socket.id, lap: stats.lap - 1 });
+        // ✅ FIX 3: lapComplete raceId room mein emit karo
         if (resolvedRaceId) {
           socket.to(resolvedRaceId).emit('lapComplete', { playerId: socket.id, lap: stats.lap - 1 });
         }
@@ -143,8 +94,10 @@ module.exports = function(io, socket){
       speed: stats.speed,
     };
 
+    // Apne aap ko update karo
     socket.emit('positionUpdate', updatePayload);
 
+    // ✅ FIX 4: sirf raceId room mein emit karo
     if (resolvedRaceId) {
       socket.to(resolvedRaceId).emit('positionUpdate', updatePayload);
     }
