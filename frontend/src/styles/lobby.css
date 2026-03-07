@@ -73,7 +73,7 @@
   color: #ffffff;
   position: relative;
   z-index: 1;
-  animation: glitch-main 3s ease-out forwards;
+  animation: glitch-main 3s infinte;
 }
 
 /* DEBUG RACE Glitch Animation - Black & White Retro */
@@ -92,12 +92,12 @@
 
 .main-title::before {
   text-shadow: -3px 0 #888888;
-  animation: glitch-top 3s linear forwards;
+  animation: glitch-top 3s infinte;
 }
 
 .main-title::after {
   text-shadow: 3px 0 #444444;
-  animation: glitch-bottom 3s linear forwards;
+  animation: glitch-bottom 3s infinte;
 }
 
 /* Main title shake animation */
