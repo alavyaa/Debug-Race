@@ -12,10 +12,8 @@ import RaceTrack from './RaceTrack';
 // Helper: get the question wrapper for a given lap+index (MCQ first)
 function getLapQuestion(data, lap, idx) {
   if (!data?.questions) return null;
-
   const questionsPerLap = 2;
   const index = (lap - 1) * questionsPerLap + idx;
-
   return data.questions[index] || null;
 }
 export default function RacePage() {
@@ -33,12 +31,17 @@ export default function RacePage() {
   const [positions, setPositions] = useState([]);
   const [mySpeed, setMySpeed] = useState(0);
 
+  // --- WINNER UI STATES ---
+  const [raceFinished, setRaceFinished] = useState(false);
+  const [winnerName, setWinnerName] = useState("");
+  const [playerStats, setPlayerStats] = useState([]);
+  // -------------------------
+
   // Always-up-to-date refs for use in callbacks/closures
   const raceDataRef = useRef(null);
   const currentLapRef = useRef(1);
   const answeredIds = useRef(new Set());
 
-  // Keep currentLapRef in sync
   useEffect(() => { currentLapRef.current = currentLap; }, [currentLap]);
 
   // Initialize race data
@@ -56,8 +59,6 @@ export default function RacePage() {
           setCurrentQuestion(firstQ?.question);
           setShowQuestion(true);
         }
-
-
       } catch (error) {
         console.error('Failed to fetch race:', error);
         navigate('/home');
@@ -92,32 +93,32 @@ export default function RacePage() {
     });
 
     socket.on('positionUpdate', ({ playerId, position, lap, speed, username }) => {
-  setPositions(prev => {
-    const existing = prev.find(p => p.playerId === playerId);
+      setPositions(prev => {
+        const existing = prev.find(p => p.playerId === playerId);
 
-    const color =
-      existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
+        const color =
+          existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
 
-    const displayName =
-         existing?.username ||
-         username ||
-         state.user?.username ||
-        `Player ${playerId?.slice(-4)}`;
+        const displayName =
+          existing?.username ||
+          username ||
+          state.user?.username ||
+          `Player ${playerId?.slice(-4)}`;
 
-    const updated = prev.filter(p => p.playerId !== playerId);
+        const updated = prev.filter(p => p.playerId !== playerId);
 
-    updated.push({
-      playerId,
-      position,
-      lap,
-      speed,
-      color,
-      username: displayName
+        updated.push({
+          playerId,
+          position,
+          lap,
+          speed,
+          color,
+          username: displayName
+        });
+
+        return updated;
+      });
     });
-
-    return updated;   // ⭐ THIS WAS MISSING
-  });
-});
 
     socket.on('lapComplete', ({ lap }) => {
       const nextLap = lap + 1;
@@ -138,9 +139,13 @@ export default function RacePage() {
       console.log(`Player ${playerId} finished in position ${rank}`);
     });
 
-    socket.on('raceFinished', () => {
-      navigate(`/results/${raceId}`);
+    // --- WINNER / RESULT LOGIC ---
+    socket.on('raceFinished', (data) => {
+      setRaceFinished(true);
+      setWinnerName(data.winner);
+      setPlayerStats(data.players);
     });
+    // -----------------------------
 
     return () => {
       socket.off('speedUpdate');
@@ -149,8 +154,7 @@ export default function RacePage() {
       socket.off('playerFinished');
       socket.off('raceFinished');
     };
-
-  }, [socket, dispatch, navigate, raceId]);
+  }, [socket, dispatch, navigate, raceId, state.user?.username]);
 
   // Handle answer submission
   const handleAnswer = useCallback(async (answer, responseTime) => {
@@ -210,6 +214,24 @@ export default function RacePage() {
 
   }, [raceId, currentQuestion?._id, socket, state.team?.code, state.playerStats.correctAnswers, state.playerStats.totalQuestions, dispatch]);
 
+  // ------- WINNER UI: Early return ---------
+  if (raceFinished) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#0d1117", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <h1 className="font-racing text-5xl text-white mb-4 neon-text">🏆 Winner: {winnerName}</h1>
+        <ul style={{ color: "#fff", fontSize: 22 }}>
+          {playerStats.map((p) => (
+            <li key={p.username}>{p.username} — Lap: {p.lap}, Speed: {p.speed} km/h</li>
+          ))}
+        </ul>
+        <button style={{ marginTop: 32, padding: "18px 36px", fontSize: 24, background: "#00aaff", color: "#111", borderRadius: 8 }}
+          onClick={() => navigate(`/results/${raceId}`)}
+        >View Full Results</button>
+      </div>
+    );
+  }
+  // ------- WINNER UI END -------
+
   return (
     <div style={{ minHeight: '100vh', background: '#0d1117', display: 'flex', flexDirection: 'column' }}>
 
@@ -222,7 +244,6 @@ export default function RacePage() {
 
       {/* Main content row */}
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-
         {/* Left: Race Track (65%) */}
         <div style={{ flex: '0 0 65%', display: 'flex', alignItems: 'stretch', minHeight: 500 }}>
           <RaceTrack players={positions} currentUserId={state.user?._id} />
@@ -230,12 +251,10 @@ export default function RacePage() {
 
         {/* Right: Leaderboard + Question Panel (35%) */}
         <div style={{ flex: '0 0 35%', background: '#161b22', borderLeft: '1px solid rgba(0,170,255,0.2)', display: 'flex', flexDirection: 'column' }}>
-
           {/* Leaderboard */}
           <div style={{ padding: '16px', borderBottom: '1px solid rgba(0,170,255,0.15)' }}>
             <Leaderboard positions={positions} currentUserId={socket?.id} />
           </div>
-
           {/* Question Panel */}
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {showQuestion && currentQuestion ? (
@@ -255,9 +274,7 @@ export default function RacePage() {
               </div>
             )}
           </div>
-
         </div>
-
       </div>
 
       {/* Bottom bar: SpeedBar */}
@@ -268,7 +285,6 @@ export default function RacePage() {
           shield={state.playerStats.shield}
         />
       </div>
-
     </div>
   );
 }
