@@ -45,13 +45,13 @@ const AppRoutes = () => {
       />
 
      <Route
-  path="/race/:raceId"
-  element={
-    <ProtectedRoute>
-      <RacePage />
-    </ProtectedRoute>
-  }
-/>
+       path="/race/:raceId"
+       element={
+         <ProtectedRoute>
+           <RacePage />
+        </ProtectedRoute>
+       }
+     />
       
       <Route
         path="/profile"
