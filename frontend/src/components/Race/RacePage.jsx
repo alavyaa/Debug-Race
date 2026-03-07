@@ -76,13 +76,10 @@ export default function RacePage() {
 
     console.log('🏎️ joinRace emit:', resolvedUser.username, raceId);
 
-    const totalLaps = raceData?.settings?.totalLaps || 2;
-
     socket.emit('joinRace', {
       raceId,
       userId: resolvedUser._id,
       username: resolvedUser.username,
-      totalLaps,
     });
 
     // Reconnect pe bhi re-emit karo
@@ -91,7 +88,6 @@ export default function RacePage() {
         raceId,
         userId: resolvedUser._id,
         username: resolvedUser.username,
-        totalLaps,
       });
     };
     socket.on('connect', handleReconnect);
