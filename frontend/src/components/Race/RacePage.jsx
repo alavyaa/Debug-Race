@@ -9,15 +9,13 @@ import SpeedBar from './SpeedBar';
 import Leaderboard from './Leaderboard';
 import RaceTrack from './RaceTrack';
 
-// Helper: get the question wrapper for a given lap+index (MCQ first)
 function getLapQuestion(data, lap, idx) {
   if (!data?.questions) return null;
-
   const questionsPerLap = 2;
   const index = (lap - 1) * questionsPerLap + idx;
-
   return data.questions[index] || null;
 }
+
 export default function RacePage() {
   const { raceId } = useParams();
   const navigate = useNavigate();
@@ -33,12 +31,10 @@ export default function RacePage() {
   const [positions, setPositions] = useState([]);
   const [mySpeed, setMySpeed] = useState(0);
 
-  // Always-up-to-date refs for use in callbacks/closures
   const raceDataRef = useRef(null);
   const currentLapRef = useRef(1);
   const answeredIds = useRef(new Set());
 
-  // Keep currentLapRef in sync
   useEffect(() => { currentLapRef.current = currentLap; }, [currentLap]);
 
   // Initialize race data
@@ -56,26 +52,47 @@ export default function RacePage() {
           setCurrentQuestion(firstQ?.question);
           setShowQuestion(true);
         }
-
-
       } catch (error) {
         console.error('Failed to fetch race:', error);
         navigate('/home');
       }
     };
-
     fetchRace();
   }, [raceId]);
 
-  // Emit joinRace when socket is ready so server can map socket.id -> username
+  // joinRace - localStorage se username lo
   useEffect(() => {
-    if (!socket || !raceId || !state.user?.username) return; // username check add kiya
+    if (!socket || !raceId) return;
+
+    let resolvedUser = state.user;
+    if (!resolvedUser) {
+      try {
+        const saved = localStorage.getItem('debugrace_user');
+        if (saved) resolvedUser = JSON.parse(saved);
+      } catch(e) {}
+    }
+
+    if (!resolvedUser?.username) return;
+
+    console.log('🏎️ joinRace emit:', resolvedUser.username, raceId);
+
     socket.emit('joinRace', {
       raceId,
-      userId: state.user?._id,
-      username: state.user?.username,
+      userId: resolvedUser._id,
+      username: resolvedUser.username,
     });
-}, [socket, raceId, state.user?._id, state.user?.username]);
+
+    const handleReconnect = () => {
+      socket.emit('joinRace', {
+        raceId,
+        userId: resolvedUser._id,
+        username: resolvedUser.username,
+      });
+    };
+    socket.on('connect', handleReconnect);
+    return () => socket.off('connect', handleReconnect);
+
+  }, [socket, raceId, state.user?._id, state.user?.username]);
 
   // Socket event listeners
   useEffect(() => {
@@ -84,40 +101,24 @@ export default function RacePage() {
     socket.on('speedUpdate', ({ playerId, speed, streak }) => {
       if (playerId === socket.id) {
         setMySpeed(speed);
-        dispatch({
-          type: 'UPDATE_PLAYER_STATS',
-          payload: { speed, streak }
-        });
+        dispatch({ type: 'UPDATE_PLAYER_STATS', payload: { speed, streak } });
       }
     });
 
     socket.on('positionUpdate', ({ playerId, position, lap, speed, username }) => {
-  setPositions(prev => {
-    const existing = prev.find(p => p.playerId === playerId);
-
-    const color =
-      existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
-
-    const displayName =
-       username ||             // ✅ server se aaya naam PEHLE
-       (playerId === socket.id ? state.user?.username : null) ||
-       existing?.username ||
-       `Player ${playerId?.slice(-4)}`;
-
-    const updated = prev.filter(p => p.playerId !== playerId);
-
-    updated.push({
-      playerId,
-      position,
-      lap,
-      speed,
-      color,
-      username: displayName
+      setPositions(prev => {
+        const existing = prev.find(p => p.playerId === playerId);
+        const color = existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
+        const displayName =
+          username ||
+          (playerId === socket.id ? state.user?.username : null) ||
+          existing?.username ||
+          `Player ${playerId?.slice(-4)}`;
+        const updated = prev.filter(p => p.playerId !== playerId);
+        updated.push({ playerId, position, lap, speed, color, username: displayName });
+        return updated;
+      });
     });
-
-    return updated;   // ⭐ THIS WAS MISSING
-  });
-});
 
     socket.on('lapComplete', ({ lap }) => {
       const nextLap = lap + 1;
@@ -149,10 +150,8 @@ export default function RacePage() {
       socket.off('playerFinished');
       socket.off('raceFinished');
     };
-
   }, [socket, dispatch, navigate, raceId]);
 
-  // Handle answer submission
   const handleAnswer = useCallback(async (answer, responseTime) => {
     if (!currentQuestion?._id) return;
     if (answeredIds.current.has(currentQuestion._id.toString())) return;
@@ -168,7 +167,7 @@ export default function RacePage() {
       const { isCorrect, streak } = response.data;
 
       socket?.emit('answerSubmitted', {
-        teamCode: state.team?.code,
+        teamCode: raceId,
         isCorrect,
         responseTime,
         raceId,
@@ -183,7 +182,6 @@ export default function RacePage() {
         }
       });
 
-      // Delay hiding the question panel so the result highlight is visible for 2s
       setTimeout(() => {
         const data = raceDataRef.current;
         const lap = currentLapRef.current;
@@ -207,36 +205,29 @@ export default function RacePage() {
     } catch (error) {
       console.error('Failed to submit answer:', error);
     }
-
-  }, [raceId, currentQuestion?._id, socket, state.team?.code, state.playerStats.correctAnswers, state.playerStats.totalQuestions, dispatch]);
+  }, [raceId, currentQuestion?._id, socket, state.playerStats.correctAnswers, state.playerStats.totalQuestions, dispatch]);
 
   return (
     <div style={{ minHeight: '100vh', background: '#0d1117', display: 'flex', flexDirection: 'column' }}>
 
-      {/* Lap counter top-left */}
       <div style={{ position: 'absolute', top: 12, left: 16, zIndex: 10, background: 'rgba(0,0,0,0.7)', borderRadius: 8, padding: '4px 14px', border: '1px solid rgba(0,170,255,0.4)' }}>
         <span className="font-racing text-white">
           Lap {currentLap} / {raceData?.settings?.totalLaps || 3}
         </span>
       </div>
 
-      {/* Main content row */}
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
 
-        {/* Left: Race Track (65%) */}
         <div style={{ flex: '0 0 65%', display: 'flex', alignItems: 'stretch', minHeight: 500 }}>
           <RaceTrack players={positions} currentUserId={state.user?._id} />
         </div>
 
-        {/* Right: Leaderboard + Question Panel (35%) */}
         <div style={{ flex: '0 0 35%', background: '#161b22', borderLeft: '1px solid rgba(0,170,255,0.2)', display: 'flex', flexDirection: 'column' }}>
 
-          {/* Leaderboard */}
           <div style={{ padding: '16px', borderBottom: '1px solid rgba(0,170,255,0.15)' }}>
             <Leaderboard positions={positions} currentUserId={state.user?._id} />
           </div>
 
-          {/* Question Panel */}
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {showQuestion && currentQuestion ? (
               <QuestionPanel
@@ -260,7 +251,6 @@ export default function RacePage() {
 
       </div>
 
-      {/* Bottom bar: SpeedBar */}
       <div style={{ background: '#0d1117', borderTop: '1px solid rgba(0,170,255,0.2)' }}>
         <SpeedBar
           speed={mySpeed}
