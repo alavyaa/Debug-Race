@@ -5,11 +5,11 @@ import { useAuth } from "../features/auth/features.authContext";
 import "../styles/room.css";
 
 const LEVEL_INFO = [
-  { level: 1, laps: 1, focus: "Syntax Basics", track: "Beginner Track" },
-  { level: 2, laps: 2, focus: "Logic Errors", track: "Rookie Track" },
-  { level: 3, laps: 3, focus: "Algorithm Bugs", track: "Pro Track" },
-  { level: 4, laps: 4, focus: "Complex Logic", track: "Expert Track" },
-  { level: 5, laps: 5, focus: "Advanced Algorithms", track: "Champion Track" },
+  { level: 1, laps: 3, focus: "Basics", track: "Beginner Track" },
+  { level: 2, laps: 3, focus: "Control Flow", track: "Street Circuit" },
+  { level: 3, laps: 4, focus: "Data Structures", track: "Technical Circuit" },
+  { level: 4, laps: 4, focus: "Algorithms", track: "Expert Track" },
+  { level: 5, laps: 5, focus: "System Design", track: "Championship Track" },
 ];
 
 const LANGUAGES = ["C", "Java", "Python", "JavaScript"];
