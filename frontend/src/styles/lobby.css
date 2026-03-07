@@ -445,6 +445,306 @@
     transform: translateY(-50%) translateX(100%);
   }
 }
+/* ========== JOIN LOBBY BUTTON ANIMATION ========== */
+
+/* Button setup for join animation */
+.secondary-action {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Button text styling */
+.secondary-action .join-btn-text {
+  position: relative;
+  z-index: 5;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Fade and shrink text when animating */
+.secondary-action.join-animating .join-btn-text {
+  opacity: 0.2;
+  transform: scale(0.95);
+}
+
+/* Lock Container - Centered in button */
+.join-lock-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+/* Show lock when animating */
+.secondary-action.join-animating .join-lock-container {
+  opacity: 1;
+}
+
+/* Lock Icon Styling - Grey color */
+.join-lock-icon {
+  font-size: 32px;
+  color: #888888;
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
+  transition: all 0.3s ease;
+}
+
+/* Lock pulse animation */
+.secondary-action.join-animating .join-lock-icon {
+  animation: join-lock-pulse 0.35s ease-in-out 4;
+}
+
+@keyframes join-lock-pulse {
+  0%, 100% {
+    transform: scale(1);
+    color: #888888;
+  }
+  50% {
+    transform: scale(1.2);
+    color: #ffd700;
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.9));
+  }
+}
+
+/* Lock opens and glows at the end */
+.secondary-action.join-animating .join-lock-icon.fa-lock-open {
+  animation: join-lock-unlock 1.5s ease forwards;
+}
+
+@keyframes join-lock-unlock {
+  0%, 60% {
+    color: #888888;
+    transform: scale(1);
+  }
+  80% {
+    color: #ffd700;
+    transform: scale(1.3);
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1));
+  }
+  100% {
+    color: #ffd700;
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1));
+  }
+}
+
+/* Floating Numbers - Black color */
+.join-number {
+  position: absolute;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  color: #1a1a1a;
+  text-shadow: 
+    0 0 8px #ffd700,
+    0 0 15px #ffd700,
+    0 0 20px rgba(255, 215, 0, 0.5);
+  z-index: 8;
+  pointer-events: none;
+  left: var(--start-x);
+  top: var(--start-y);
+  opacity: 0;
+  animation: join-number-fly 1.3s ease-in-out forwards;
+  animation-delay: var(--delay);
+}
+
+/* Numbers floating then flying to lock keyhole */
+@keyframes join-number-fly {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(0);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1.2) translateY(-8px);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1) translateY(5px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) translateY(-3px);
+    left: var(--start-x);
+    top: var(--start-y);
+  }
+  100% {
+    opacity: 0;
+    left: 50%;
+    top: 50%;
+    transform: scale(0) translate(-50%, -50%);
+  }
+}
+
+/* Button glow during animation */
+.secondary-action.join-animating {
+  border-color: #ffd700;
+  box-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.6),
+    0 0 40px rgba(255, 215, 0, 0.3),
+    inset 0 0 15px rgba(255, 215, 0, 0.1);
+  animation: join-button-glow 0.4s ease-in-out 3;
+}
+
+@keyframes join-button-glow {
+  0%, 100% {
+    box-shadow: 
+      0 0 20px rgba(255, 215, 0, 0.6),
+      0 0 40px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 30px rgba(255, 215, 0, 0.9),
+      0 0 50px rgba(255, 215, 0, 0.6),
+      0 0 70px rgba(255, 215, 0, 0.4);
+  }
+}
+
+/* Keyhole absorption sparkle effect */
+.secondary-action.join-animating::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70px;
+  height: 70px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 215, 0, 0.5) 0%,
+    rgba(255, 215, 0, 0.2) 30%,
+    transparent 60%
+  );
+  border-radius: 50%;
+  animation: join-keyhole-absorb 0.25s ease-in-out 5;
+  animation-delay: 0.2s;
+  pointer-events: none;
+  z-index: 6;
+}
+
+@keyframes join-keyhole-absorb {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 1;
+  }
+}
+
+/* Center glow trail effect */
+.secondary-action.join-animating::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 215, 0, 0.25) 0%,
+    rgba(255, 215, 0, 0.1) 30%,
+    transparent 60%
+  );
+  animation: join-center-glow 1.5s ease-out forwards;
+  pointer-events: none;
+  z-index: 4;
+}
+
+@keyframes join-center-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+/* Success unlock flash */
+.join-lock-container::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 215, 0, 0.8) 0%,
+    rgba(255, 215, 0, 0.3) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.secondary-action.join-animating .join-lock-container::after {
+  animation: join-unlock-flash 0.6s ease-out forwards;
+  animation-delay: 1.1s;
+}
+
+@keyframes join-unlock-flash {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.8);
+  }
+}
+
+/* Number particle trail effect */
+.join-number::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 215, 0, 0.4) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  z-index: -1;
+  animation: join-number-trail 1.3s ease-out forwards;
+  animation-delay: inherit;
+}
+
+@keyframes join-number-trail {
+  0%, 50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
 /* Grey Buttons */
 /* .neutral-action {
   border-color: #555;
