@@ -284,6 +284,8 @@ Deploy instantly on Railway.
 
 - Hamzaul Rahman
 - Alavya Bajpai
+- Shaurya Pratap Singh
+- Aditya Bariya
 - Vishwas Panwar
 - Raj Roshan Singh
 
