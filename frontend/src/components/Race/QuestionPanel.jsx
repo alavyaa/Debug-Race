@@ -6,10 +6,6 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [result, setResult] = useState(null);
 
-  // Normalize options to always be [{ id: 'A', text: '...' }, ...]
-  const options = (question?.options || []).map((opt, i) => ({
-    id: typeof opt === 'object' && opt.id ? opt.id : String.fromCharCode(65 + i),
-    text: typeof opt === 'object' ? (opt.text || opt.label || String(opt)) : String(opt),
   }));
 
   // Refs to avoid stale closures
@@ -96,11 +92,6 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
   };
 
   const getOptionStyle = (optId) => {
-    const base = 'w-full text-left p-3 rounded-lg border transition-all mb-2 font-body text-sm ';
-    if (isSubmitted && result) {
-      if (optId === result.correctAnswer) return base + 'border-green-500 bg-green-500/20 text-green-300';
-      if (optId === selectedAnswer && !result.isCorrect) return base + 'border-red-500 bg-red-500/20 text-red-300';
-      return base + 'border-gray-700 bg-gray-800/30 text-gray-500';
     }
     if (selectedAnswer === optId) return base + 'border-blue-400 bg-blue-400/20 text-white';
     return base + 'border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-400 cursor-pointer';

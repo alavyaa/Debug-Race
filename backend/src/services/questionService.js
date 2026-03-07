@@ -12,37 +12,9 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
   const questions = [];
   const questionsPerLap = 2;
 
-  console.log(`📚 Generating ${totalLaps * questionsPerLap} questions for ${language} (Level ${level})`);
-
   for (let lap = 1; lap <= totalLaps; lap++) {
     for (let q = 0; q < questionsPerLap; q++) {
-      // Lap 1: MCQ only
-      // Lap 2+: First question MCQ, second question DEBUG
       const questionType = lap === 1 ? 'MCQ' : (q === 0 ? 'MCQ' : 'DEBUG');
-
-      console.log(`  Generating Lap ${lap}, Question ${q + 1} (${questionType})`);
-
-      try {
-        const questionData = await generateQuestion({
-          language,
-          difficulty: level,
-          type: questionType,
-        });
-        const question = await Question.create({
-          ...questionData,
-          language,
-          difficulty: level,
-          type: questionType,
-          isAIGenerated: true,
-        });
-        questions.push({ question: question._id, lap, type: questionType });
-      } catch (err) {
-        console.error(`Failed to generate Q lap=${lap} q=${q}:`, err.message);
-      }
-    }
-  }
-
-  console.log(`✅ Generated ${questions.length} questions`);
   return questions;
 };
 

@@ -57,12 +57,6 @@ export default function RacePage() {
           setShowQuestion(true);
         }
 
-        // Emit joinRace so backend can map socket.id -> userId/username
-        socket?.emit('joinRace', {
-          raceId,
-          userId: state.user?._id,
-          username: state.user?.username || 'Unknown',
-        });
 
       } catch (error) {
         console.error('Failed to fetch race:', error);
@@ -71,7 +65,6 @@ export default function RacePage() {
     };
 
     fetchRace();
-  }, [raceId, dispatch, navigate, socket, state.user]);
 
   // Socket event listeners
   useEffect(() => {
@@ -94,10 +87,6 @@ export default function RacePage() {
         const displayName = existing?.username || username || `Player ${playerId?.slice(-4)}`;
         const updated = prev.filter(p => p.playerId !== playerId);
         updated.push({ playerId, position, lap, speed, color, username: displayName });
-        return updated.sort((a, b) => {
-          if (a.lap !== b.lap) return b.lap - a.lap;
-          return b.position - a.position;
-        });
       });
     });
 
