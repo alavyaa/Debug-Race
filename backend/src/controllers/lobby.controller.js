@@ -264,23 +264,28 @@ async function startRaceController(req, res) {
     );
 
     const race = await raceModel.create({
-      lobby: lobby._id,
-      players: lobby.members.map((m) => ({
-        user: m.user,
-        completed: false,
-        finishTime: null,
-        submissions: 0,
-        score: 0,
-      })),
-      questions: generatedQuestions,
-      settings: {
-        language: lobby.settings.language,
-        level: lobby.settings.level,
-        totalLaps,
-      },
-      startTime: new Date(),
-      status: "ongoing",
-    });
+  lobby: lobby._id,
+  players: lobby.members.map((m) => ({
+    user: m.user,
+    completed: false,
+    finishTime: null,
+    submissions: 0,
+    score: 0,
+  })),
+
+  questions: generatedQuestions.map((q) => ({
+    question: q._id
+  })),
+
+  settings: {
+    language: lobby.settings.language,
+    level: lobby.settings.level,
+    totalLaps,
+  },
+
+  startTime: new Date(),
+  status: "ongoing",
+});
 
     lobby.status = "racing";
     lobby.currentRace = race._id;
