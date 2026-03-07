@@ -158,6 +158,42 @@
     opacity: 0;
   }
 }
+
+/* F1 Car Animation inside the button */
+.primary-action {
+  position: relative; /* make button a relative container */
+  overflow: hidden;   /* hide car outside button */
+}
+
+.primary-action .f1-car {
+  position: absolute;
+  top: 50%;
+  left: -50px; /* start slightly outside left */
+  width: 50px;
+  height: 30px;
+  background: url('https://i.postimg.cc/3xQ0QbXr/f1-car.png') no-repeat center;
+  background-size: contain;
+  transform: translateY(-50%);
+  pointer-events: none;
+  animation: f1-move-btn 1s forwards;
+}
+
+@keyframes f1-move-btn {
+  0% {
+    left: -50px;
+    transform: translateY(-50%) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    left: 50%;
+    transform: translateY(-50%) rotate(5deg);
+  }
+  100% {
+    left: 100%;
+    transform: translateY(-50%) rotate(-5deg);
+    opacity: 0;
+  }
+}
 /* Grey Buttons */
 /* .neutral-action {
   border-color: #555;
