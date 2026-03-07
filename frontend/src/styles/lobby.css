@@ -72,7 +72,8 @@
   margin-bottom: 10px;
   color: #ffffff;
   position: relative;
-  animation: glitch 3s linear forwards;
+  z-index: 1;
+  animation: glitch-main 3s ease-out forwards;
 }
 
 /* DEBUG RACE Glitch Animation - Black & White Retro */
@@ -86,20 +87,21 @@
   height: 100%;
   color: #ffffff;
   background: transparent;
-  opacity: 1;
+  z-index: 2;
 }
 
 .main-title::before {
-  text-shadow: -3px 0 #666666;
+  text-shadow: -3px 0 #888888;
   animation: glitch-top 3s linear forwards;
 }
 
 .main-title::after {
-  text-shadow: 3px 0 #333333;
+  text-shadow: 3px 0 #444444;
   animation: glitch-bottom 3s linear forwards;
 }
 
-@keyframes glitch {
+/* Main title shake animation */
+@keyframes glitch-main {
   0% {
     transform: translate(0);
   }
@@ -150,6 +152,7 @@
   }
 }
 
+/* Top glitch layer */
 @keyframes glitch-top {
   0% {
     clip-path: inset(0 0 85% 0);
@@ -159,47 +162,38 @@
   5% {
     clip-path: inset(15% 0 65% 0);
     transform: translate(3px, 0);
-    opacity: 1;
   }
   10% {
     clip-path: inset(40% 0 40% 0);
     transform: translate(-2px, 0);
-    opacity: 1;
   }
   15% {
     clip-path: inset(60% 0 20% 0);
     transform: translate(2px, 0);
-    opacity: 1;
   }
   20% {
     clip-path: inset(20% 0 60% 0);
     transform: translate(-3px, 0);
-    opacity: 1;
   }
   25% {
     clip-path: inset(70% 0 10% 0);
     transform: translate(1px, 0);
-    opacity: 1;
   }
   30% {
     clip-path: inset(5% 0 80% 0);
     transform: translate(-1px, 0);
-    opacity: 1;
   }
   35% {
     clip-path: inset(30% 0 50% 0);
     transform: translate(2px, 0);
-    opacity: 1;
   }
   40% {
     clip-path: inset(50% 0 30% 0);
     transform: translate(-2px, 0);
-    opacity: 1;
   }
   45% {
     clip-path: inset(10% 0 70% 0);
     transform: translate(3px, 0);
-    opacity: 1;
   }
   50% {
     clip-path: inset(25% 0 55% 0);
@@ -214,20 +208,16 @@
   60% {
     clip-path: inset(35% 0 55% 0);
     transform: translate(-1px, 0);
-    opacity: 0.4;
+    opacity: 0.3;
   }
-  65% {
-    clip-path: inset(0 0 90% 0);
-    transform: translate(0);
-    opacity: 0.2;
-  }
-  70%, 100% {
-    clip-path: inset(0 0 100% 0);
+  65%, 100% {
+    clip-path: inset(50% 0 50% 0);
     transform: translate(0);
     opacity: 0;
   }
 }
 
+/* Bottom glitch layer */
 @keyframes glitch-bottom {
   0% {
     clip-path: inset(85% 0 0 0);
@@ -237,47 +227,38 @@
   5% {
     clip-path: inset(65% 0 15% 0);
     transform: translate(-2px, 0);
-    opacity: 1;
   }
   10% {
     clip-path: inset(40% 0 40% 0);
     transform: translate(3px, 0);
-    opacity: 1;
   }
   15% {
     clip-path: inset(20% 0 60% 0);
     transform: translate(-3px, 0);
-    opacity: 1;
   }
   20% {
     clip-path: inset(60% 0 20% 0);
     transform: translate(1px, 0);
-    opacity: 1;
   }
   25% {
     clip-path: inset(10% 0 70% 0);
     transform: translate(-1px, 0);
-    opacity: 1;
   }
   30% {
     clip-path: inset(80% 0 5% 0);
     transform: translate(2px, 0);
-    opacity: 1;
   }
   35% {
     clip-path: inset(50% 0 30% 0);
     transform: translate(-2px, 0);
-    opacity: 1;
   }
   40% {
     clip-path: inset(30% 0 50% 0);
     transform: translate(3px, 0);
-    opacity: 1;
   }
   45% {
     clip-path: inset(70% 0 10% 0);
     transform: translate(-1px, 0);
-    opacity: 1;
   }
   50% {
     clip-path: inset(55% 0 25% 0);
@@ -292,15 +273,10 @@
   60% {
     clip-path: inset(55% 0 35% 0);
     transform: translate(1px, 0);
-    opacity: 0.4;
+    opacity: 0.3;
   }
-  65% {
-    clip-path: inset(90% 0 0 0);
-    transform: translate(0);
-    opacity: 0.2;
-  }
-  70%, 100% {
-    clip-path: inset(100% 0 0 0);
+  65%, 100% {
+    clip-path: inset(50% 0 50% 0);
     transform: translate(0);
     opacity: 0;
   }
