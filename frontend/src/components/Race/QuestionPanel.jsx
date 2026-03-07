@@ -98,27 +98,31 @@ export default function QuestionPanel({ question, questionNumber, onAnswer }) {
 
       {/* Options */}
       <div className="space-y-3 mb-4">
-        {question?.options?.map((option) => (
-          <button
-            key={option.id}
-            onClick={() => !isSubmitted && setSelectedAnswer(option.id)}
-            disabled={isSubmitted}
-            className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-              isSubmitted
-                ? option.id === result?.correctAnswer
-                  ? 'border-neon-green bg-neon-green/20 text-neon-green'
-                  : option.id === selectedAnswer && option.id !== result?.correctAnswer
-                  ? 'border-red-500 bg-red-500/20 text-red-500'
-                  : 'border-gray-600 text-gray-400'
-                : selectedAnswer === option.id
-                ? 'border-neon-blue bg-neon-blue/20 text-white'
-                : 'border-gray-600 hover:border-neon-blue/50 text-gray-300'
-            }`}
-          >
-            <span className="font-racing mr-3">{option.id}.</span>
-            <span className="font-body">{option.text}</span>
-          </button>
-        ))}
+        {question?.options?.map((option) => {
+          let optionClass = 'border-gray-600 hover:border-neon-blue/50 text-gray-300';
+          if (isSubmitted) {
+            if (option.id === result?.correctAnswer) {
+              optionClass = 'border-neon-green bg-neon-green/20 text-neon-green';
+            } else if (option.id === selectedAnswer && !result?.isCorrect) {
+              optionClass = 'border-red-500 bg-red-500/20 text-red-500';
+            } else {
+              optionClass = 'border-gray-600 text-gray-400';
+            }
+          } else if (selectedAnswer === option.id) {
+            optionClass = 'border-neon-blue bg-neon-blue/20 text-white';
+          }
+          return (
+            <button
+              key={option.id}
+              onClick={() => !isSubmitted && setSelectedAnswer(option.id)}
+              disabled={isSubmitted}
+              className={`w-full p-4 rounded-lg border-2 text-left transition-all ${optionClass}`}
+            >
+              <span className="font-racing mr-3">{option.id}.</span>
+              <span className="font-body">{option.text}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Submit Button */}
@@ -134,15 +138,13 @@ export default function QuestionPanel({ question, questionNumber, onAnswer }) {
         </Button>
       )}
 
-      {/* Result Feedback */}
       {isSubmitted && result && (
-        <div className={`p-4 rounded-lg ${
-          result.isCorrect ? 'bg-neon-green/20 border border-neon-green' : 'bg-red-500/20 border border-red-500'
+        <div className={`w-full py-3 px-4 rounded-lg ${
+          result.isCorrect ? 'bg-neon-green/20 text-neon-green border border-neon-green' : 'bg-red-500/20 text-red-500 border border-red-500'
         }`}>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">{result.isCorrect ? '✅' : '❌'}</span>
-            <span className={`font-racing text-lg ${result.isCorrect ? 'text-neon-green' : 'text-red-500'}`}>
-              {result.isCorrect ? 'Correct! Speed boost!' : 'Wrong! Speed penalty!'}
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-racing text-lg">
+              {result.isCorrect ? '✅ Correct! Speed boost!' : '❌ Wrong! Speed penalty!'}
             </span>
           </div>
           {result.explanation && (

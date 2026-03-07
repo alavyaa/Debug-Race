@@ -1,27 +1,25 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGame } from '../../context/GameContext';
 import { useSocket } from '../../context/SocketContext';
 import api from "../../services/api.service";
-import Phaser from 'phaser';
-import { RaceScene } from '../../game/scenes/RaceScene';
+import { PLAYER_COLORS } from '../../utils/constants';
 import QuestionPanel from './QuestionPanel';
 import SpeedBar from './SpeedBar';
 import Leaderboard from './Leaderboard';
+import RaceTrack from './RaceTrack';
 
 export default function RacePage() {
   const { raceId } = useParams();
   const navigate = useNavigate();
   const { state, dispatch } = useGame();
   const { socket } = useSocket();
-  const gameRef = useRef(null);
-  const gameContainerRef = useRef(null);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [showQuestion, setShowQuestion] = useState(true);
   const [raceData, setRaceData] = useState(null);
   const [positions, setPositions] = useState([]);
-  const [gameInstance, setGameInstance] = useState(null);
+  const [mySpeed, setMySpeed] = useState(0);
 
   // Initialize race data
   useEffect(() => {
@@ -35,6 +33,19 @@ export default function RacePage() {
           setCurrentQuestion(response.data.questions[0].question);
         }
 
+        // Build initial positions from raceData players
+        if (response.data.players?.length > 0) {
+          const initialPositions = response.data.players.map((p, idx) => ({
+            playerId: p.userId || p._id || p.socketId,
+            username: p.username || p.name || `Player ${idx + 1}`,
+            position: 0,
+            lap: 1,
+            speed: 0,
+            color: PLAYER_COLORS[idx % PLAYER_COLORS.length],
+          }));
+          setPositions(initialPositions);
+        }
+
       } catch (error) {
         console.error('Failed to fetch race:', error);
         navigate('/home');
@@ -44,78 +55,36 @@ export default function RacePage() {
     fetchRace();
   }, [raceId, dispatch, navigate]);
 
-  // Initialize Phaser game
-  useEffect(() => {
-    if (!gameContainerRef.current || gameInstance) return;
-
-    const config = {
-      type: Phaser.AUTO,
-      width: 800,
-      height: 600,
-      parent: gameContainerRef.current,
-      backgroundColor: '#1a1a2e',
-      physics: {
-        default: 'arcade',
-        arcade: {
-          debug: false
-        }
-      },
-      scene: [RaceScene]
-    };
-
-    const game = new Phaser.Game(config);
-    setGameInstance(game);
-
-    game.registry.set('socket', socket);
-    game.registry.set('dispatch', dispatch);
-    game.registry.set('raceId', raceId);
-    game.registry.set('userId', state.user?._id);
-
-    return () => {
-      game.destroy(true);
-    };
-
-  }, [gameContainerRef.current]);
-
   // Socket event listeners
   useEffect(() => {
     if (!socket) return;
 
     socket.on('speedUpdate', ({ playerId, speed, streak }) => {
-
-      if (gameInstance?.scene?.scenes[0]) {
-        gameInstance.scene.scenes[0].updateCarSpeed(playerId, speed);
-      }
-
       if (playerId === socket.id) {
+        setMySpeed(speed);
         dispatch({
           type: 'UPDATE_PLAYER_STATS',
           payload: { speed, streak }
         });
       }
-
     });
 
     socket.on('positionUpdate', ({ playerId, position, lap, speed }) => {
-
       setPositions(prev => {
+        const existing = prev.find(p => p.playerId === playerId);
+        const color = existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
+        const username = existing?.username ||
+          raceData?.players?.find(p => (p.userId || p._id || p.socketId) === playerId)?.username ||
+          `Player ${playerId?.slice(-4)}`;
 
         const updated = prev.filter(p => p.playerId !== playerId);
-
-        updated.push({
-          playerId,
-          position,
-          lap,
-          speed
-        });
+        updated.push({ playerId, position, lap, speed, color, username });
 
         return updated.sort((a, b) => {
           if (a.lap !== b.lap) return b.lap - a.lap;
           return b.position - a.position;
         });
-
       });
-
     });
 
     socket.on('newQuestion', ({ question, questionIndex: idx }) => {
@@ -132,7 +101,7 @@ export default function RacePage() {
       console.log(`Player ${playerId} finished in position ${rank}`);
     });
 
-    socket.on('raceFinished', ({ results }) => {
+    socket.on('raceFinished', () => {
       navigate(`/results/${raceId}`);
     });
 
@@ -145,7 +114,7 @@ export default function RacePage() {
       socket.off('raceFinished');
     };
 
-  }, [socket, gameInstance, dispatch, navigate, raceId]);
+  }, [socket, dispatch, navigate, raceId, raceData]);
 
   // Handle answer submission
   const handleAnswer = useCallback(async (answer, responseTime) => {
@@ -198,47 +167,58 @@ export default function RacePage() {
   }, [raceId, currentQuestion, socket, state, dispatch, questionIndex, raceData]);
 
   return (
-    <div className="min-h-screen bg-dark-100 flex">
+    <div style={{ minHeight: '100vh', background: '#0d1117', display: 'flex', flexDirection: 'column' }}>
 
-      <div className="flex-1 relative">
+      {/* Lap counter top-left */}
+      <div style={{ position: 'absolute', top: 12, left: 16, zIndex: 10, background: 'rgba(0,0,0,0.7)', borderRadius: 8, padding: '4px 14px', border: '1px solid rgba(0,170,255,0.4)' }}>
+        <span className="font-racing text-white">
+          Lap {state.playerStats.lap} / {raceData?.settings?.totalLaps || 3}
+        </span>
+      </div>
 
-        <div
-          ref={gameContainerRef}
-          className="w-full h-full"
-        />
+      {/* Main content row */}
+      <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
 
-        <div className="absolute bottom-4 left-4 right-4">
-          <SpeedBar
-            speed={state.playerStats.speed}
-            nitro={state.playerStats.nitro}
-            shield={state.playerStats.shield}
-          />
+        {/* Left: Race Track (65%) */}
+        <div style={{ flex: '0 0 65%', display: 'flex', alignItems: 'stretch', minHeight: 500 }}>
+          <RaceTrack players={positions} currentUserId={socket?.id} />
         </div>
 
-        <div className="absolute top-4 left-4 bg-dark-200/80 rounded-lg px-4 py-2">
-          <span className="font-racing text-white">
-            Lap {state.playerStats.lap} / {raceData?.settings?.totalLaps || 3}
-          </span>
+        {/* Right: Leaderboard + Question Panel (35%) */}
+        <div style={{ flex: '0 0 35%', background: '#161b22', borderLeft: '1px solid rgba(0,170,255,0.2)', display: 'flex', flexDirection: 'column' }}>
+
+          {/* Leaderboard */}
+          <div style={{ padding: '16px', borderBottom: '1px solid rgba(0,170,255,0.15)' }}>
+            <Leaderboard positions={positions} currentUserId={socket?.id} />
+          </div>
+
+          {/* Question Panel */}
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            {showQuestion && currentQuestion && (
+              <QuestionPanel
+                question={currentQuestion}
+                questionNumber={questionIndex + 1}
+                onAnswer={handleAnswer}
+              />
+            )}
+            {!showQuestion && (
+              <div style={{ padding: 24, textAlign: 'center', color: '#888' }}>
+                <p className="font-body">Waiting for next question...</p>
+              </div>
+            )}
+          </div>
+
         </div>
 
       </div>
 
-      <div className="w-96 bg-dark-200 border-l border-neon-blue/30 flex flex-col">
-
-        <div className="p-4 border-b border-neon-blue/20">
-          <Leaderboard positions={positions} currentUserId={socket?.id} />
-        </div>
-
-        <div className="flex-1 overflow-y-auto">
-          {showQuestion && currentQuestion && (
-            <QuestionPanel
-              question={currentQuestion}
-              questionNumber={questionIndex + 1}
-              onAnswer={handleAnswer}
-            />
-          )}
-        </div>
-
+      {/* Bottom bar: SpeedBar */}
+      <div style={{ background: '#0d1117', borderTop: '1px solid rgba(0,170,255,0.2)' }}>
+        <SpeedBar
+          speed={mySpeed}
+          nitro={state.playerStats.nitro}
+          shield={state.playerStats.shield}
+        />
       </div>
 
     </div>
