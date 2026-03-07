@@ -94,6 +94,14 @@ export default function RacePage() {
     });
 
     socket.on('positionUpdate', ({ playerId, position, lap, speed }) => {
+      // Accumulate position deltas
+      if (!playerPositions.current[playerId]) {
+        playerPositions.current[playerId] = { position: 0, lap: 1 };
+      }
+      playerPositions.current[playerId].position =
+        (playerPositions.current[playerId].position + (position || 0)) % 1;
+      playerPositions.current[playerId].lap = lap;
+
       setPositions(prev => {
         const existing = prev.find(p => p.playerId === playerId);
         const color = existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
@@ -104,7 +112,14 @@ export default function RacePage() {
           `Player ${playerId?.slice(-4)}`;
 
         const updated = prev.filter(p => p.playerId !== playerId);
-        updated.push({ playerId, position, lap, speed, color, username });
+        updated.push({
+          playerId,
+          position: playerPositions.current[playerId].position,
+          lap,
+          speed,
+          color,
+          username
+        });
 
         return updated.sort((a, b) => {
           if (a.lap !== b.lap) return b.lap - a.lap;

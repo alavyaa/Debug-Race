@@ -71,6 +71,14 @@ export default function RaceTrack({ players = [], currentUserId }) {
     ctx.stroke();
     ctx.restore();
 
+    // Fill inner void with page background color
+    ctx.save();
+    ctx.fillStyle = '#0d1117';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx - trackWidth / 2 - 4, ry - trackWidth / 2 - 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
     // Draw dashed center lane line
     ctx.save();
     ctx.strokeStyle = 'rgba(255,255,255,0.15)';
