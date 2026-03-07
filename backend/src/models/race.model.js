@@ -30,13 +30,43 @@ const raceSchema = new mongoose.Schema(
           type: Number,
           default: 0,
         },
+
+        score: {
+          type: Number,
+          default: 0,
+        },
       },
     ],
 
-    problem: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Problem", // If you create Problem model later
-      default: null,
+    questions: [
+      {
+        question: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Question",
+        },
+        lap: {
+          type: Number,
+        },
+        type: {
+          type: String,
+          enum: ["MCQ", "DEBUG"],
+        },
+      },
+    ],
+
+    settings: {
+      language: {
+        type: String,
+        default: "JavaScript",
+      },
+      level: {
+        type: Number,
+        default: 1,
+      },
+      totalLaps: {
+        type: Number,
+        default: 2,
+      },
     },
 
     startTime: {
