@@ -260,7 +260,7 @@ Weak topics detection:
 [Hamzaul Rahman](https://github.com/Hamzaul)
 [Alavya Bajpai](https://github.com/alavyaa)
 [Vishwas Panwar](https://github.com/vishwas-panwar)
-
+[Raj Roshan Singh](https://github.com/singhrajroshan)
 
 ## 🚀 Future Improvements
 
