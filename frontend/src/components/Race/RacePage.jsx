@@ -113,18 +113,33 @@ export default function RacePage() {
       }
     });
 
-    socket.on('positionUpdate', ({ playerId, position, lap, speed, username }) => {
+    socket.on('positionUpdate', (player) => {
       setPositions(prev => {
-        const existing = prev.find(p => p.playerId === playerId);
-        const color = existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
-        const displayName =
-          username ||
-          (playerId === socket.id ? state.user?.username : null) ||
-          existing?.username ||
-          `Player ${playerId?.slice(-4)}`;
-        const updated = prev.filter(p => p.playerId !== playerId);
-        updated.push({ playerId, position, lap, speed, color, username: displayName });
+
+          const existing = prev.find(p => p.playerId === player.playerId);
+
+         const color =
+           existing?.color ||
+           PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
+
+         const displayName =
+            player.username ||
+            existing?.username ||
+            `Player-${player.playerId.slice(-4)}`;
+
+         const updated = prev.filter(p => p.playerId !== player.playerId);
+
+          updated.push({
+          playerId: player.playerId,
+          position: player.position,
+          lap: player.lap,
+          speed: player.speed,
+          color,
+          username: displayName
+        });
+
         return updated;
+
       });
     });
 
