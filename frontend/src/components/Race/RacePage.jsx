@@ -37,6 +37,7 @@ export default function RacePage() {
   const raceDataRef = useRef(null);
   const currentLapRef = useRef(1);
   const answeredIds = useRef(new Set());
+  const playerPositions = useRef({});
 
   // Keep currentLapRef in sync
   useEffect(() => { currentLapRef.current = currentLap; }, [currentLap]);

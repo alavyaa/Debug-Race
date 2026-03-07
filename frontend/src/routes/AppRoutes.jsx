@@ -8,6 +8,7 @@ import { useAuth } from "../features/auth/features.authContext";
 import ProtectedRoute from "./ProtectedRoute";
 import Loader from "../pages/LoaderPage";
 import RacePage from "../components/Race/RacePage";
+import RaceEndPage from "../components/RaceEnd/RaceEndPage";
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -61,6 +62,17 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/results/:raceId"
+        element={
+          <ProtectedRoute>
+            <RaceEndPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/" />} />
 
     </Routes>
   );
