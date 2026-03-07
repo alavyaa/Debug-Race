@@ -99,7 +99,10 @@ export default function RacePage() {
       existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
 
     const displayName =
-      existing?.username || username || `Player ${playerId?.slice(-4)}`;
+         existing?.username ||
+         username ||
+         state.user?.username ||
+        `Player ${playerId?.slice(-4)}`;
 
     const updated = prev.filter(p => p.playerId !== playerId);
 
