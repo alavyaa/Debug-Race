@@ -66,6 +66,16 @@ export default function RacePage() {
 
     fetchRace();
 
+  // Emit joinRace when socket is ready so server can map socket.id -> username
+  useEffect(() => {
+    if (!socket || !raceId) return;
+    socket.emit('joinRace', {
+      raceId,
+      userId: state.user?._id,
+      username: state.user?.username,
+    });
+  }, [socket, raceId, state.user?._id, state.user?.username]);
+
   // Socket event listeners
   useEffect(() => {
     if (!socket) return;
@@ -154,8 +164,7 @@ export default function RacePage() {
         }
       });
 
-      setShowQuestion(false);
-
+      // Delay hiding the question panel so the result highlight is visible for 2s
       setTimeout(() => {
         const data = raceDataRef.current;
         const lap = currentLapRef.current;
@@ -167,6 +176,7 @@ export default function RacePage() {
             setShowQuestion(true);
             return nextIdx;
           } else {
+            setShowQuestion(false);
             setWaitingForNextLap(true);
             return prev;
           }
