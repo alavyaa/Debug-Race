@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api.service";
-import "../styles/room.css";   // 🔥 ADD THIS
+import "../styles/room.css";
 
 const RoomPage = () => {
   const { code } = useParams();
@@ -22,7 +22,7 @@ const RoomPage = () => {
       setLobby(res.data);
       setError(null);
 
-      // 🔥 If race started → redirect
+      // If race started → redirect
       if (res.data.status === "racing" && res.data.currentRace) {
         navigate(`/race/${res.data.currentRace}`);
         return;
@@ -41,9 +41,7 @@ const RoomPage = () => {
 
     fetchLobby();
 
-    const interval = setInterval(() => {
-      fetchLobby();
-    }, 3000);
+    const interval = setInterval(fetchLobby, 3000);
 
     return () => clearInterval(interval);
   }, [fetchLobby, code]);
@@ -122,7 +120,7 @@ const RoomPage = () => {
       {/* Header */}
       <div className="room-header">
         <h1 className="room-title">
-          LOBBY CODE: <span>{lobby.code}</span>
+          LOBBY CODE: <span>{lobby?.code}</span>
         </h1>
 
         <button
@@ -136,18 +134,21 @@ const RoomPage = () => {
       {/* Status */}
       <div className="room-status">
         <p>
-          STATUS: <span className="status">{lobby.status}</span>
+          STATUS: <span className="status">{lobby?.status}</span>
         </p>
 
         <p>
-          LEADER: <span className="leader">{lobby.leader.username}</span>
+          LEADER:{" "}
+          <span className="leader">
+            {lobby?.leader?.username || "Unknown"}
+          </span>
         </p>
       </div>
 
       {/* Players */}
       <div className="players-grid">
 
-        {lobby.members.map((member) => (
+        {lobby?.members?.map((member) => (
           <div
             key={member.user._id}
             className="player-card"
@@ -155,7 +156,10 @@ const RoomPage = () => {
             <div className="flex justify-between items-center">
 
               <div>
-                <p className="player-name">{member.username}</p>
+                <p className="player-name">
+                  {member?.user?.username || "Player"}
+                </p>
+
                 <p className="player-status">
                   {member.isReady ? "Ready" : "Not Ready"}
                 </p>
@@ -184,7 +188,7 @@ const RoomPage = () => {
           TOGGLE READY
         </button>
 
-        {lobby.status === "ready" && (
+        {lobby?.status === "ready" && (
           <button
             onClick={startRace}
             disabled={updating}
