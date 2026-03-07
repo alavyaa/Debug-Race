@@ -280,14 +280,54 @@ Deploy instantly on Railway.
 
 ---
 
-# 👨‍💻 Contributors
+### Project Contributors
 
-- Hamzaul Rahman
-- Alavya Bajpai
-- Shaurya Pratap Singh
-- Aditya Bariya
-- Vishwas Panwar
-- Raj Roshan Singh
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/ShauryaSingh1709" target="_blank">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="60" />
+        <br />
+        <sub><b>Shaurya</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/ADiBariya" target="_blank">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="60" />
+        <br />
+        <sub><b>Aditya</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Hamzaul" target="_blank">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="60" />
+        <br />
+        <sub><b>Hamza</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/alavyaa" target="_blank">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="60" />
+        <br />
+        <sub><b>Alavya</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Vishwas-panwar" target="_blank">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="60" />
+        <br />
+        <sub><b>Vishwas</b></sub>
+      </a>
+      </td>
+    <td align="center">
+      <a href="https://github.com/singhrajroshan" target="_blank">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="60" />
+        <br />
+        <sub><b>Raj</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
 ---
 
