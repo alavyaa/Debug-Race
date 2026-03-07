@@ -57,23 +57,35 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
 
         questions.push(question);
 
-      } catch (error) {
-        console.error(`    ❌ Error generating question:`, error.message);
+    catch (error) {
 
-        // Use fallback
-        const questionData = await generateQuestion({
-          language,
-          difficulty: level,
-          type: questionType
-        });
+  console.error(`❌ Error generating question:`, error.message);
 
-        const question = await Question.create({
-          ...questionData,
-          language,
-          difficulty: level,
-          type: questionType,
-          isAIGenerated: false
-        });
+  const fallbackQuestion = {
+    question: "What is the output?",
+    code: "let x = 5;\nconsole.log(x * 2);",
+    topic: "operators",
+    options: [
+      { id: "A", text: "10" },
+      { id: "B", text: "5" },
+      { id: "C", text: "25" },
+      { id: "D", text: "Error" }
+    ],
+    correctAnswer: "A",
+    explanation: "5 * 2 = 10",
+    timeLimit: 30
+  };
+
+  const question = await Question.create({
+    ...fallbackQuestion,
+    language,
+    difficulty: level,
+    type: questionType,
+    isAIGenerated: false
+  });
+
+  questions.push(question);
+}
 
         questions.push(question);
       }
