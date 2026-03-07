@@ -50,18 +50,24 @@ const Profile = () => {
         >
 
           {/* Avatar */}
-        <div style={{ textAlign: "center" }}>
+      <div style={{ textAlign: "center" }}>
   <img
     src={
       user?.avatar ||
-      `https://api.dicebear.com/7.x/adventurer/svg?seed=${user?.username}`
+      `https://api.dicebear.com/7.x/adventurer/svg?seed=${user?.username || "racer"}`
     }
     alt="avatar"
+    onError={(e) => {
+      console.error('Avatar failed to load:', e);
+      e.target.src = `https://api.dicebear.com/7.x/adventurer/svg?seed=racer`;
+    }}
     style={{
       width: "100px",
       height: "100px",
       borderRadius: "50%",
-      border: "2px solid #ffd700"
+      border: "2px solid #ffd700",
+      objectFit: "cover",
+      backgroundColor: "#f0f0f0"
     }}
   />
 </div>
