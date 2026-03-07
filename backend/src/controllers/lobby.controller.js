@@ -1,5 +1,6 @@
 const lobbyModel = require("../models/lobby.model");
 const raceModel = require("../models/race.model");
+const { generateQuestionsForRace } = require("../services/questionService");
 
 async function createLobbyController(req, res) {
   try {
@@ -208,6 +209,13 @@ async function startRaceController(req, res) {
         message: "At least 2 players required",
       });
     }
+    // Generate questions for the race
+    const totalLaps = 2;
+    const generatedQuestions = await generateQuestionsForRace(
+      lobby.settings.language,
+      lobby.settings.level,
+      totalLaps
+    );
     // Create Race
     const race = await raceModel.create({
       lobby: lobby._id,
@@ -215,7 +223,15 @@ async function startRaceController(req, res) {
         user: m.user,
         completed: false,
         finishTime: null,
+        submissions: 0,
+        score: 0,
       })),
+      questions: generatedQuestions.map((q, idx) => ({
+        question: q._id,
+        lap: Math.floor(idx / 2) + 1,
+        type: idx % 2 === 0 ? "MCQ" : "DEBUG",
+      })),
+      settings: { language: lobby.settings.language, level: lobby.settings.level, totalLaps },
       startTime: new Date(),
       status: "ongoing",
     });
