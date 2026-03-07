@@ -67,11 +67,11 @@ const Lobby = () => {
 
         <div className="button-group">
           <button className="primary-action" onClick={handleCreate}>
-            🚀 CREATE LOBBY
+            CREATE LOBBY
           </button>
 
           <button className="secondary-action" onClick={handleJoin}>
-            🔑 JOIN LOBBY
+            JOIN LOBBY
           </button>
 
         </div>
