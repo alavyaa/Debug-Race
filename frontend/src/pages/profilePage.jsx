@@ -54,7 +54,7 @@ const Profile = () => {
   <img
     src={
       user?.avatar ||
-      `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.username}`
+      'https://api.dicebear.com/7.x/adventurer/svg?seed=username'
     }
     alt="avatar"
     style={{
