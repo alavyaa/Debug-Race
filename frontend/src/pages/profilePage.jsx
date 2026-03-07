@@ -45,23 +45,23 @@ const Profile = () => {
             background: "rgba(0,0,0,0.6)",
           }}
         >
-          {/* Avatar Section */}
-          <div style={{ textAlign: "center" }}>
-            <F1Avatar
-              userId={user?.id || "UNKNOWN"}
-              username={user?.username || "RACER"}
-              size="large"
-            />
-          </div>
+         {/* Avatar Section */}
+<div style={{ textAlign: "center" }}>
+  <F1Avatar
+    userId={user?.id || "UNKNOWN"}
+    username={user?.username || "RACER"}
+    lobbyPosition={playerIndex}   // IMPORTANT
+    size="large"
+  />
+</div>
 
-          {/* Name */}
-          <div>
-            <p style={{ color: "#ffd700", letterSpacing: "2px" }}>NAME</p>
-            <h3 style={{ marginTop: "5px" }}>
-              {user?.username || "UNKNOWN RACER"}
-            </h3>
-          </div>
-
+{/* Name */}
+<div>
+  <p style={{ color: "#ffd700", letterSpacing: "2px" }}>NAME</p>
+  <h3 style={{ marginTop: "5px" }}>
+    {user?.username || "UNKNOWN RACER"}
+  </h3>
+</div>
           {/* Email */}
           <div>
             <p style={{ color: "#ffd700", letterSpacing: "2px" }}>EMAIL</p>
