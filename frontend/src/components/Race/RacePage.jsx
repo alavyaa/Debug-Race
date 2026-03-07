@@ -12,12 +12,12 @@ import RaceTrack from './RaceTrack';
 // Helper: get the question wrapper for a given lap+index (MCQ first)
 function getLapQuestion(data, lap, idx) {
   if (!data?.questions) return null;
-  const lapQs = data.questions
-    .filter(q => q.lap === lap)
-    .sort((a, b) => (a.type === 'MCQ' ? -1 : 1));
-  return lapQs[idx] || null;
-}
 
+  const questionsPerLap = 2;
+  const index = (lap - 1) * questionsPerLap + idx;
+
+  return data.questions[index] || null;
+}
 export default function RacePage() {
   const { raceId } = useParams();
   const navigate = useNavigate();
