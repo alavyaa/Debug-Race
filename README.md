@@ -1,221 +1,253 @@
 # 🏎 DEBUG RACE
 
-*Decode.Optimize.Accelerate*
+> **Decode • Optimize • Accelerate**
 
-## 🚀 Project Overview
+![GitHub Repo stars](https://img.shields.io/github/stars/Hamzaul/Debug-Race?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/Hamzaul/Debug-Race?style=for-the-badge)
+![GitHub issues](https://img.shields.io/github/issues/Hamzaul/Debug-Race?style=for-the-badge)
+![GitHub license](https://img.shields.io/github/license/Hamzaul/Debug-Race?style=for-the-badge)
+![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge)
+![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-green?style=for-the-badge)
+![Socket.io](https://img.shields.io/badge/Socket.io-Realtime-black?style=for-the-badge)
 
-DEBUG RACE is a multiplayer competitive coding racing game where players race cars on top-down tracks by solving coding challenges.
+---
 
-Instead of traditional coding competitions, DEBUG RACE turns debugging and problem solving into a real-time racing experience.
+# 🚀 Project Overview
 
-- ✅ Correct answers → Speed Boost
+**DEBUG RACE** is a **real-time multiplayer coding racing game** where players compete on a racing track by solving coding problems.
 
-- ❌ Wrong answers → Speed Drop
+Instead of traditional coding contests, DEBUG RACE transforms **debugging and problem solving into an esports-style racing experience.**
 
-The game combines:
+Players accelerate their cars by solving coding challenges.
 
-- Real-time multiplayer racing
+✔ Correct answer → **Speed Boost**  
+❌ Wrong answer → **Speed Drop**
 
-- Coding challenges
+The project combines:
 
-- AI-powered question generation
+- 🏎 Real-time multiplayer racing
+- 🧠 Coding challenges
+- 🤖 AI powered question generation
+- 🎮 Esports-style UI
+- ⚡ Competitive gameplay
 
-- Esports-style UI/UX
+---
 
-to create a fast-paced learning environment for programmers.
+# 🎮 Core Features
 
-## 🎮 Game Features
-### 🏎 Real-Time Multiplayer Racing
+## 🏎 Real-Time Multiplayer Racing
 
-Players compete in live races where coding performance controls car speed.
+Players compete simultaneously in live coding races.
 
-### 🤖 AI Question Engine
+Speed depends on **accuracy and response time**.
 
-Adaptive AI generates coding questions based on player performance.
+---
 
-### 🧠 Adaptive Difficulty
+## 🤖 AI Question Engine
 
-Difficulty adjusts dynamically:
+An AI engine dynamically generates coding questions.
 
-Accuracy > 80% → Harder questions
-Accuracy < 50% → Easier questions
-### ⚡ Power-Up System
+Questions adapt based on player performance.
 
-Players unlock power-ups through streaks.
+---
 
-Streak	Power-Up
-3 Correct	Nitro Boost
-5 Correct	Shield
-7 Correct	Slow Opponent
-### 🏁 Esports Style Interface
+## 🧠 Adaptive Difficulty
 
-Includes:
+Difficulty adjusts automatically.
 
-- Leaderboards
+| Accuracy | Difficulty |
+|--------|--------|
+| > 80% | Harder Questions |
+| < 50% | Easier Questions |
 
-- Player avatars
+---
 
-- Live speed indicators
+## ⚡ Power-Up System
 
-- Race podium results
+Players earn power-ups through correct answer streaks.
 
-## 🏎 Game Flow
-### 1️⃣ Loader Page – Ignition Mode
+| Streak | Power-Up |
+|------|------|
+| 3 Correct | Nitro Boost |
+| 5 Correct | Shield |
+| 7 Correct | Slow Opponent |
 
-- Dark racing theme
+---
 
-- Animated racetrack loading bar
+## 🏁 Esports Style Interface
 
-- Press ENTER to Ignite Engine
+The interface includes:
 
-Transition:
+- 🏆 Leaderboards
+- 🚗 Player avatars
+- ⚡ Live speed indicators
+- 🏁 Race podium results
 
-🔴 🔴 🔴 🔴 🔴
-Lights Out → Race Begins
-### 2️⃣ Home Page – Control Center
+---
+
+# 🏎 Game Flow
+
+## 1️⃣ Loader Page — Ignition Mode
+
+Dark racing themed loading screen.
+
+Press **ENTER** to start.
+
+---
+
+## 2️⃣ Home Page — Control Center
 
 Players can:
 
-🚀 Create Team
-🔑 Join Team
-🏆 Leaderboard
-📊 Stats
+- 🚀 Create Team
+- 🔑 Join Team
+- 🏆 Leaderboard
+- 📊 Stats
 
-Creating a team generates a 6-digit team code.
+Example Team Code:
 
-Example:
+---
 
-Team Code: 482913
-### 3️⃣ Lobby – Pre-Race Arena
+## 3️⃣ Lobby — Pre-Race Arena
 
-Lobby shows:
+Lobby displays:
 
 - Team Name
-
 - Selected Language
-
 - Level
-
 - Player Avatars
-
 - Ready Status
 
-Leader can start the race once all players are ready.
+Leader can start the race when everyone is ready.
 
-🏁 START RACE
-### 🏆 Level System
-Level	Name	Difficulty	Laps
-1	Rookie Grid	Beginner	2
-2	Code Circuit	Easy–Intermediate	3
-3	Logic Grand Prix	Intermediate	4
-4	Algorithm Arena	Advanced	5
-5	Championship Circuit	Expert	6
-## 🗺 Track Themes
+---
+
+# 🏆 Level System
+
+| Level | Name | Difficulty | Laps |
+|------|------|------|------|
+| 1 | Rookie Grid | Beginner | 2 |
+| 2 | Code Circuit | Easy–Intermediate | 3 |
+| 3 | Logic Grand Prix | Intermediate | 4 |
+| 4 | Algorithm Arena | Advanced | 5 |
+| 5 | Championship Circuit | Expert | 6 |
+
+---
+
+# 🗺 Track Themes
 
 Each level has a unique racing track.
 
-Track	Description
-Rookie Grid	Simple oval
-Code Circuit	Sharp turns
-Logic GP	Split lane
-Algorithm Arena	Technical curves
-Championship Circuit	Complex grand prix
-## 🚗 Car Types
+| Track | Description |
+|------|------|
+| Rookie Grid | Simple oval |
+| Code Circuit | Sharp turns |
+| Logic GP | Split lane |
+| Algorithm Arena | Technical curves |
+| Championship Circuit | Complex grand prix |
 
-Players can choose different car styles.
+---
 
-Car	Ability
-Speedster	Balanced
-TurboX	High boost
-StablePro	Low penalty
-## 🧑‍✈️ Driver Avatars
+# 🚗 Car Types
 
-Players select racing avatars such as:
+| Car | Ability |
+|------|------|
+| Speedster | Balanced |
+| TurboX | High boost |
+| StablePro | Low penalty |
+
+---
+
+# 🧑‍✈️ Driver Avatars
+
+Players can choose avatars such as:
 
 - Coder Ninja
-
 - Algorithm Ace
-
 - Debug Master
-
 - AI Racer
-
 - Cyber Mechanic
 
-## 💻 Supported Languages
-C
-Python
-Java
+---
+
+# 💻 Supported Languages
+
+- C
+- Python
+- Java
 
 Each team selects one language for the entire race.
 
-## 🖥 Race Interface
+---
 
-The gameplay screen includes:
+# 🖥 Race Interface
 
 ### Track Area
 
 - Racing cars
-
 - Player avatars
-
 - Speed bars
+- Position ranking
 
-Position ranking
+---
 
 ### Question Panel
 
+Displays:
+
 - Coding question
-
 - Code snippet
-
-- Options
-
+- Multiple choice answers
 - Countdown timer
+
+---
 
 ### Bottom Panel
 
+Shows:
+
 - Mini leaderboard
-
 - Lap progress
-
 - Streak counter
 
-## 🏁 Race Results
+---
 
-After the race finishes, the podium appears.
+# 🏁 Race Results
 
-🥇 1st Place
-🥈 2nd Place
-🥉 3rd Place
+After the race:
 
-Statistics displayed:
+🥇 First Place  
+🥈 Second Place  
+🥉 Third Place
+
+Statistics include:
 
 - Accuracy %
-
 - Total time
-
 - Boost usage
-
 - Average response time
 
-## 📊 Performance Analysis
+---
 
-Players receive post-race insights.
+# 📊 Performance Analysis
+
+Players receive insights such as:
 
 ### Mistake Review
 
 - Wrong answers
+- Correct explanations
 
-- Correct explanation
+---
 
 ### Performance Graphs
 
 - Speed vs Time
-
 - Accuracy %
+- Response Time
 
-- Response time
+---
 
 ### Learning Insights
 
@@ -225,63 +257,71 @@ Weak topics detection:
 - Conditions
 - Functions
 - Data Structures
-## 🏗 Tech Stack
-### Frontend
+
+---
+
+# 🏗 Tech Stack
+
+## Frontend
 
 - React
-
 - Phaser.js
-
 - Tailwind CSS
-
 - Vite
 
-### Backend
+---
+
+## Backend
 
 - Node.js
-
 - Express.js
-
 - Socket.io
-
 - MongoDB
-
 - Mongoose
 
-### AI System
+---
+
+## AI System
 
 - OpenAI API
-
 - Adaptive Question Generator
 
+---
 
-## 👨‍💻 Contributors
+# 🏗 Architecture
 
-[Hamzaul Rahman](https://github.com/Hamzaul)
-[Alavya Bajpai](https://github.com/alavyaa)
-[Vishwas Panwar](https://github.com/vishwas-panwar)
-[Raj Roshan Singh](https://github.com/singhrajroshan)
+---
 
-## 🚀 Future Improvements
+# 🚀 Deployment
 
-- Spectator mode
-
-- Ranked matchmaking
-
-- Global tournaments
-
-- Replay system
-
-- AI coaching assistant
-
-- Full 3D racing engine
-
-## ⭐ Support
-
-If you like this project, please consider giving it a ⭐ on GitHub!
-
-## 🚀 One Click Deploy
+### One Click Deploy
 
 Deploy instantly on Railway.
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/new?template=https://github.com/Hamzaul/Debug-Race)
+
+---
+
+# 👨‍💻 Contributors
+
+- Hamzaul Rahman
+- Alavya Bajpai
+- Vishwas Panwar
+- Raj Roshan Singh
+
+---
+
+# 🚀 Future Improvements
+
+- Spectator mode
+- Ranked matchmaking
+- Global tournaments
+- Replay system
+- AI coaching assistant
+- Full 3D racing engine
+
+---
+
+# ⭐ Support
+
+If you like this project, consider giving it a ⭐ on GitHub!
