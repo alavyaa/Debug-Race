@@ -1,12 +1,14 @@
-
-
 /**
- * OpenRouter configuration
+ * OpenRouter AI configuration
  */
+
 const OpenAI = require("openai");
 
+/**
+ * ⚠️ Replace this with your OpenRouter API key
+ */
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: "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",
   baseURL: "https://openrouter.ai/api/v1",
   defaultHeaders: {
     "HTTP-Referer": "https://debug-race-ztam.onrender.com",
@@ -15,19 +17,16 @@ const openai = new OpenAI({
 });
 
 /**
- * Skill focus areas by level
+ * Skill focus areas
  */
 const SKILL_FOCUS = {
   1: ["syntax", "data types", "basic operators", "input/output"],
   2: ["loops", "conditionals", "strings", "arrays"],
   3: ["functions", "recursion", "scope", "error handling"],
   4: ["data structures", "algorithms", "complexity", "OOP"],
-  5: ["advanced algorithms", "edge cases", "optimization", "design patterns"]
+  5: ["advanced algorithms", "edge cases", "optimization"]
 };
 
-/**
- * Level names
- */
 const LEVEL_NAMES = {
   1: "Rookie Grid",
   2: "Code Circuit",
@@ -37,8 +36,9 @@ const LEVEL_NAMES = {
 };
 
 /**
- * Generate a coding question using AI
+ * Generate AI Question
  */
+
 const generateQuestion = async ({ language, difficulty, type, performanceData }) => {
 
   const skills = SKILL_FOCUS[difficulty] || SKILL_FOCUS[1];
@@ -60,7 +60,7 @@ Difficulty: ${difficulty}/5 (${levelName})
 Type: ${type}
 Focus topic: ${skillFocus}
 
-Return ONLY valid JSON in this format:
+Return ONLY JSON in this format:
 
 {
   "question": "text",
@@ -75,83 +75,59 @@ Return ONLY valid JSON in this format:
   "correctAnswer":"A",
   "explanation":"text"
 }
-
-Do NOT include markdown.
 `;
 
   try {
 
-    console.log(
-      `🤖 Generating ${type} question | ${language} | Level ${difficulty} | Focus ${skillFocus}`
-    );
+    console.log(`🤖 Generating ${type} question | ${language} | Level ${difficulty}`);
 
-   const completion = await openai.chat.completions.create({
-  model: "mistralai/devstral-2512:free",
-  messages: [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: "Generate the question." }
-  ],
-  temperature: 0.7,
-  max_tokens: 800
-});
+    const completion = await openai.chat.completions.create({
+      model: "deepseek/deepseek-chat:free",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: "Generate the question." }
+      ],
+      temperature: 0.7,
+      max_tokens: 700
+    });
 
-    /**
-     * Safety check for API response
-     */
-    if (!completion || !completion.choices || completion.choices.length === 0) {
-      throw new Error("Invalid response from AI");
-    }
-
-    const content = completion.choices[0]?.message?.content;
+    const content = completion.choices?.[0]?.message?.content;
 
     if (!content) {
-      throw new Error("AI returned empty content");
+      throw new Error("Empty AI response");
     }
 
     console.log("📥 Raw AI response:", content);
 
     let questionData;
 
-    /**
-     * Parse JSON safely
-     */
     try {
       questionData = JSON.parse(content);
-    } catch (parseError) {
-
-      console.log("⚠️ JSON parsing failed, attempting extraction...");
+    } catch {
 
       const jsonMatch = content.match(/\{[\s\S]*\}/);
 
       if (!jsonMatch) {
-        throw new Error("Could not extract JSON from AI response");
+        throw new Error("Invalid JSON response");
       }
 
       questionData = JSON.parse(jsonMatch[0]);
     }
 
-    /**
-     * Validate response fields
-     */
     if (
       !questionData.question ||
       !questionData.options ||
-      !questionData.correctAnswer ||
-      !questionData.explanation
+      !questionData.correctAnswer
     ) {
-      throw new Error("AI returned invalid question format");
+      throw new Error("Invalid AI question format");
     }
 
-    /**
-     * Attach metadata
-     */
     questionData.timeLimit = type === "DEBUG" ? 45 : 30;
     questionData.language = language;
     questionData.difficulty = difficulty;
     questionData.type = type;
-    questionData.topic = questionData.topic || skillFocus;
 
-    console.log("✅ Question generated successfully");
+    console.log("✅ AI Question Generated");
 
     return questionData;
 
@@ -159,21 +135,21 @@ Do NOT include markdown.
 
     console.error("❌ AI generation failed:", error.message);
 
-    console.log("⚠️ Using fallback question");
-
     return getFallbackQuestion(language, type, difficulty, skillFocus);
   }
 };
 
+
 /**
- * Fallback question generator
+ * Fallback question
  */
+
 const getFallbackQuestion = (language, type, difficulty, skillFocus) => {
 
-  const defaultQuestion = {
+  return {
     question: "What is the output of this code?",
     code: "let x = 5;\nconsole.log(x * 2);",
-    topic: "operators",
+    topic: skillFocus,
     options: [
       { id: "A", text: "10" },
       { id: "B", text: "5" },
@@ -181,16 +157,11 @@ const getFallbackQuestion = (language, type, difficulty, skillFocus) => {
       { id: "D", text: "Error" }
     ],
     correctAnswer: "A",
-    explanation: "5 multiplied by 2 equals 10.",
-    timeLimit: type === "DEBUG" ? 45 : 30
-  };
-
-  return {
-    ...defaultQuestion,
+    explanation: "5 * 2 = 10",
+    timeLimit: type === "DEBUG" ? 45 : 30,
     language,
     difficulty,
     type,
-    topic: skillFocus,
     isAIGenerated: false
   };
 };
