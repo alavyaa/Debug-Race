@@ -72,7 +72,7 @@
   margin-bottom: 10px;
   background: linear-gradient(to right, #fff, #bbb);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: white;
   /* DEBUG RACE Glitch Animation */
   position: relative;
   animation: glitch 4s;
