@@ -150,14 +150,14 @@ const RoomPage = () => {
 
         {lobby?.members?.map((member) => (
           <div
-            key={member.user._id}
+            key={member?.user?._id || member?.username}
             className="player-card"
           >
             <div className="flex justify-between items-center">
 
               <div>
                 <p className="player-name">
-                  {member?.user?.username || "Player"}
+                  {member?.user?.username || member?.username || "Player"}
                 </p>
 
                 <p className="player-status">
