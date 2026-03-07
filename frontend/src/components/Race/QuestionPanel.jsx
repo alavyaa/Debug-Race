@@ -1,79 +1,123 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Button from '../common/Button';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
-export default function QuestionPanel({ question, questionNumber, onAnswer }) {
+export default function QuestionPanel({ question, questionNumber, totalQuestions = 3, onAnswer }) {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [timeLeft, setTimeLeft] = useState(question?.timeLimit || 30);
-  const [startTime] = useState(Date.now());
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [result, setResult] = useState(null);
 
-  // Timer
-  useEffect(() => {
-    if (isSubmitted || timeLeft <= 0) return;
+  // Refs to avoid stale closures
+  const isSubmittedRef = useRef(false);
+  const selectedAnswerRef = useRef(null);
+  const startTimeRef = useRef(Date.now());
+  const timerRef = useRef(null);
 
-    const timer = setInterval(() => {
+  // Keep refs in sync with state
+  useEffect(() => { selectedAnswerRef.current = selectedAnswer; }, [selectedAnswer]);
+
+  // Reset ALL state when question._id changes (new question)
+  useEffect(() => {
+    isSubmittedRef.current = false;
+    selectedAnswerRef.current = null;
+    startTimeRef.current = Date.now();
+    setSelectedAnswer(null);
+    setTimeLeft(question?.timeLimit || 30);
+    setIsSubmitted(false);
+    setResult(null);
+  }, [question?._id]);
+
+  // Timer — count down independently
+  useEffect(() => {
+    if (isSubmitted) return;
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
-          handleSubmit(null);
+          clearInterval(timerRef.current);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [isSubmitted, timeLeft]);
+    return () => clearInterval(timerRef.current);
+  }, [isSubmitted, question?._id]);
 
-  // Reset on new question
+  // Auto-submit when time runs out
   useEffect(() => {
-    setSelectedAnswer(null);
-    setTimeLeft(question?.timeLimit || 30);
-    setIsSubmitted(false);
-    setResult(null);
-  }, [question]);
+    if (timeLeft === 0 && !isSubmittedRef.current) {
+      handleSubmit(selectedAnswerRef.current);
+    }
+  }, [timeLeft, handleSubmit]);
 
   const handleSubmit = useCallback(async (answer) => {
-    if (isSubmitted) return;
-
+    if (isSubmittedRef.current) return;
+    isSubmittedRef.current = true;
+    clearInterval(timerRef.current);
     setIsSubmitted(true);
-    const responseTime = (Date.now() - startTime) / 1000;
-    
-    const response = await onAnswer(answer || selectedAnswer, responseTime);
-    setResult(response);
-  }, [isSubmitted, selectedAnswer, startTime, onAnswer]);
+
+    const finalAnswer = (answer !== null && answer !== undefined) ? answer : selectedAnswerRef.current;
+    const responseTime = (Date.now() - startTimeRef.current) / 1000;
+
+    const response = await onAnswer(finalAnswer, responseTime);
+    if (response) setResult(response);
+  }, [onAnswer]);
 
   const getTimerColor = () => {
-    if (timeLeft > 20) return 'text-neon-green';
-    if (timeLeft > 10) return 'text-neon-yellow';
-    return 'text-red-500';
+    if (timeLeft > 20) return '#00ff88';
+    if (timeLeft > 10) return '#ffdd00';
+    return '#ff4444';
+  };
+
+  const getOptionClass = (option) => {
+    if (isSubmitted && result) {
+      const isCorrectOption = option.id === result.correctAnswer;
+      const isMyWrongAnswer = option.id === selectedAnswer && !result.isCorrect;
+
+      if (isCorrectOption) {
+        return 'border-neon-green bg-neon-green/20 text-neon-green';
+      } else if (isMyWrongAnswer) {
+        return 'border-red-500 bg-red-500/20 text-red-500';
+      } else {
+        return 'border-gray-600 text-gray-400';
+      }
+    }
+    if (selectedAnswer === option.id) {
+      return 'border-neon-blue bg-neon-blue/20 text-white';
+    }
+    return 'border-gray-600 hover:border-neon-blue/50 text-gray-300';
   };
 
   return (
     <div className="p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <span className="font-racing text-neon-blue">Question {questionNumber}</span>
-        <span className={`font-racing text-xl ${getTimerColor()}`}>
+        <span className="font-racing text-neon-blue">
+          Question {questionNumber}/{totalQuestions}
+        </span>
+        <span className="font-racing text-xl" style={{ color: getTimerColor() }}>
           {timeLeft}s
         </span>
       </div>
 
       {/* Timer bar */}
       <div className="h-1 bg-dark-100 rounded-full mb-4 overflow-hidden">
-        <div 
-          className={`h-full transition-all duration-1000 ${
-            timeLeft > 20 ? 'bg-neon-green' : timeLeft > 10 ? 'bg-neon-yellow' : 'bg-red-500'
-          }`}
-          style={{ width: `${(timeLeft / (question?.timeLimit || 30)) * 100}%` }}
+        <div
+          className="h-full rounded-full"
+          style={{
+            width: `${(timeLeft / (question?.timeLimit || 30)) * 100}%`,
+            background: getTimerColor(),
+            transition: 'width 1s linear, background 0.3s',
+          }}
         />
       </div>
 
       {/* Question Type Badge */}
       <div className="mb-4">
         <span className={`px-2 py-1 rounded text-xs font-body ${
-          question?.type === 'DEBUG' 
-            ? 'bg-red-500/20 text-red-400' 
+          question?.type === 'DEBUG'
+            ? 'bg-red-500/20 text-red-400'
             : 'bg-neon-purple/20 text-neon-purple'
         }`}>
           {question?.type === 'DEBUG' ? '🐛 Debug' : '📝 MCQ'}
@@ -98,49 +142,40 @@ export default function QuestionPanel({ question, questionNumber, onAnswer }) {
 
       {/* Options */}
       <div className="space-y-3 mb-4">
-        {question?.options?.map((option) => {
-          let optionClass = 'border-gray-600 hover:border-neon-blue/50 text-gray-300';
-          if (isSubmitted) {
-            if (option.id === result?.correctAnswer) {
-              optionClass = 'border-neon-green bg-neon-green/20 text-neon-green';
-            } else if (option.id === selectedAnswer && !result?.isCorrect) {
-              optionClass = 'border-red-500 bg-red-500/20 text-red-500';
-            } else {
-              optionClass = 'border-gray-600 text-gray-400';
-            }
-          } else if (selectedAnswer === option.id) {
-            optionClass = 'border-neon-blue bg-neon-blue/20 text-white';
-          }
-          return (
-            <button
-              key={option.id}
-              onClick={() => !isSubmitted && setSelectedAnswer(option.id)}
-              disabled={isSubmitted}
-              className={`w-full p-4 rounded-lg border-2 text-left transition-all ${optionClass}`}
-            >
-              <span className="font-racing mr-3">{option.id}.</span>
-              <span className="font-body">{option.text}</span>
-            </button>
-          );
-        })}
+        {question?.options?.map((option) => (
+          <button
+            key={option.id}
+            onClick={() => !isSubmitted && setSelectedAnswer(option.id)}
+            disabled={isSubmitted}
+            className={`w-full p-4 rounded-lg border-2 text-left transition-all ${getOptionClass(option)}`}
+          >
+            <span className="font-racing mr-3">{option.id}.</span>
+            <span className="font-body">{option.text}</span>
+          </button>
+        ))}
       </div>
 
       {/* Submit Button */}
       {!isSubmitted && (
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={() => handleSubmit(selectedAnswer)}
+        <button
+          onClick={() => handleSubmit(selectedAnswerRef.current)}
           disabled={!selectedAnswer}
-          className="w-full"
+          className={`w-full py-3 px-4 rounded-lg font-racing text-base transition-all ${
+            selectedAnswer
+              ? 'bg-neon-blue text-white hover:bg-neon-blue/80'
+              : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+          }`}
         >
           Submit Answer
-        </Button>
+        </button>
       )}
 
+      {/* Result feedback */}
       {isSubmitted && result && (
         <div className={`w-full py-3 px-4 rounded-lg ${
-          result.isCorrect ? 'bg-neon-green/20 text-neon-green border border-neon-green' : 'bg-red-500/20 text-red-500 border border-red-500'
+          result.isCorrect
+            ? 'bg-neon-green/20 text-neon-green border border-neon-green'
+            : 'bg-red-500/20 text-red-500 border border-red-500'
         }`}>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-racing text-lg">

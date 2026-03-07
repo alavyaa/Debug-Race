@@ -32,7 +32,7 @@ export default function RaceTrack({ players = [], currentUserId }) {
     ctx.fillStyle = '#0d1117';
     ctx.fillRect(0, 0, W, H);
 
-    // Draw outer track border (green glow)
+    // Draw outer green glow ellipse
     ctx.save();
     ctx.shadowColor = '#00ff88';
     ctx.shadowBlur = 18;
@@ -43,7 +43,24 @@ export default function RaceTrack({ players = [], currentUserId }) {
     ctx.stroke();
     ctx.restore();
 
-    // Draw inner track border (green glow)
+    // Draw track surface as thick stroke
+    ctx.save();
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = trackWidth;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+
+    // Fill inner void so it looks like a proper donut track
+    ctx.save();
+    ctx.fillStyle = '#0d1117';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx - trackWidth / 2 - 2, ry - trackWidth / 2 - 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Draw inner green glow ellipse
     ctx.save();
     ctx.shadowColor = '#00ff88';
     ctx.shadowBlur = 18;
@@ -51,15 +68,6 @@ export default function RaceTrack({ players = [], currentUserId }) {
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.ellipse(cx, cy, rx - trackWidth / 2 - 4, ry - trackWidth / 2 - 4, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-
-    // Draw track surface
-    ctx.save();
-    ctx.strokeStyle = '#1e2530';
-    ctx.lineWidth = trackWidth;
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
 

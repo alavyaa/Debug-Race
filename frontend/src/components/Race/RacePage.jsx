@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGame } from '../../context/GameContext';
 import { useSocket } from '../../context/SocketContext';
@@ -9,35 +9,59 @@ import SpeedBar from './SpeedBar';
 import Leaderboard from './Leaderboard';
 import RaceTrack from './RaceTrack';
 
+// Helper: get the question wrapper for a given lap+index (MCQ first)
+function getLapQuestion(data, lap, idx) {
+  if (!data?.questions) return null;
+  const lapQs = data.questions
+    .filter(q => q.lap === lap)
+    .sort((a, b) => (a.type === 'MCQ' ? -1 : 1));
+  return lapQs[idx] || null;
+}
+
 export default function RacePage() {
   const { raceId } = useParams();
   const navigate = useNavigate();
   const { state, dispatch } = useGame();
   const { socket } = useSocket();
+
+  const [currentLap, setCurrentLap] = useState(1);
+  const [lapQIdx, setLapQIdx] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [showQuestion, setShowQuestion] = useState(true);
+  const [showQuestion, setShowQuestion] = useState(false);
+  const [waitingForNextLap, setWaitingForNextLap] = useState(false);
   const [raceData, setRaceData] = useState(null);
   const [positions, setPositions] = useState([]);
   const [mySpeed, setMySpeed] = useState(0);
+
+  // Always-up-to-date refs for use in callbacks/closures
+  const raceDataRef = useRef(null);
+  const currentLapRef = useRef(1);
+  const answeredIds = useRef(new Set());
+
+  // Keep currentLapRef in sync
+  useEffect(() => { currentLapRef.current = currentLap; }, [currentLap]);
 
   // Initialize race data
   useEffect(() => {
     const fetchRace = async () => {
       try {
         const response = await api.get(`/race/${raceId}`);
-        setRaceData(response.data);
-        dispatch({ type: 'SET_RACE', payload: response.data });
+        const raceResp = response.data;
+        raceDataRef.current = raceResp;
+        setRaceData(raceResp);
+        dispatch({ type: 'SET_RACE', payload: raceResp });
 
-        if (response.data.questions?.length > 0) {
-          setCurrentQuestion(response.data.questions[0].question);
+        const firstQ = getLapQuestion(raceResp, 1, 0);
+        if (firstQ) {
+          setCurrentQuestion(firstQ.question);
+          setShowQuestion(true);
         }
 
-        // Build initial positions from raceData players
-        if (response.data.players?.length > 0) {
-          const initialPositions = response.data.players.map((p, idx) => ({
-            playerId: p.userId || p._id || p.socketId,
-            username: p.username || p.name || `Player ${idx + 1}`,
+        // Build initial positions — race populates players[].user as { _id, username, avatar }
+        if (raceResp.players?.length > 0) {
+          const initialPositions = raceResp.players.map((p, idx) => ({
+            playerId: p.user?._id?.toString() || p._id?.toString(),
+            username: p.user?.username || `Player ${idx + 1}`,
             position: 0,
             lap: 1,
             speed: 0,
@@ -74,7 +98,9 @@ export default function RacePage() {
         const existing = prev.find(p => p.playerId === playerId);
         const color = existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
         const username = existing?.username ||
-          raceData?.players?.find(p => (p.userId || p._id || p.socketId) === playerId)?.username ||
+          raceDataRef.current?.players?.find(p =>
+            (p.user?._id || p.user)?.toString() === playerId
+          )?.user?.username ||
           `Player ${playerId?.slice(-4)}`;
 
         const updated = prev.filter(p => p.playerId !== playerId);
@@ -87,14 +113,19 @@ export default function RacePage() {
       });
     });
 
-    socket.on('newQuestion', ({ question, questionIndex: idx }) => {
-      setCurrentQuestion(question);
-      setQuestionIndex(idx);
-      setShowQuestion(true);
-    });
-
-    socket.on('lapComplete', ({ playerId, lap }) => {
-      console.log(`Player ${playerId} completed lap ${lap}`);
+    socket.on('lapComplete', ({ lap }) => {
+      const nextLap = lap + 1;
+      const data = raceDataRef.current;
+      const nextQ = getLapQuestion(data, nextLap, 0);
+      if (nextQ) {
+        setCurrentLap(nextLap);
+        currentLapRef.current = nextLap;
+        setLapQIdx(0);
+        setCurrentQuestion(nextQ.question);
+        setWaitingForNextLap(false);
+        setShowQuestion(true);
+        answeredIds.current.clear();
+      }
     });
 
     socket.on('playerFinished', ({ playerId, rank }) => {
@@ -108,19 +139,20 @@ export default function RacePage() {
     return () => {
       socket.off('speedUpdate');
       socket.off('positionUpdate');
-      socket.off('newQuestion');
       socket.off('lapComplete');
       socket.off('playerFinished');
       socket.off('raceFinished');
     };
 
-  }, [socket, dispatch, navigate, raceId, raceData]);
+  }, [socket, dispatch, navigate, raceId]);
 
   // Handle answer submission
   const handleAnswer = useCallback(async (answer, responseTime) => {
+    if (!currentQuestion?._id) return;
+    if (answeredIds.current.has(currentQuestion._id.toString())) return;
+    answeredIds.current.add(currentQuestion._id.toString());
 
     try {
-
       const response = await api.post(`/race/${raceId}/answer`, {
         questionId: currentQuestion._id,
         answer,
@@ -132,7 +164,8 @@ export default function RacePage() {
       socket?.emit('answerSubmitted', {
         teamCode: state.team?.code,
         isCorrect,
-        responseTime
+        responseTime,
+        raceId,
       });
 
       dispatch({
@@ -147,15 +180,20 @@ export default function RacePage() {
       setShowQuestion(false);
 
       setTimeout(() => {
-
-        const nextIndex = questionIndex + 1;
-
-        if (raceData?.questions?.[nextIndex]) {
-          setCurrentQuestion(raceData.questions[nextIndex].question);
-          setQuestionIndex(nextIndex);
-          setShowQuestion(true);
-        }
-
+        const data = raceDataRef.current;
+        const lap = currentLapRef.current;
+        setLapQIdx(prev => {
+          const nextIdx = prev + 1;
+          const nextQ = getLapQuestion(data, lap, nextIdx);
+          if (nextQ) {
+            setCurrentQuestion(nextQ.question);
+            setShowQuestion(true);
+            return nextIdx;
+          } else {
+            setWaitingForNextLap(true);
+            return prev;
+          }
+        });
       }, 2000);
 
       return response.data;
@@ -164,7 +202,7 @@ export default function RacePage() {
       console.error('Failed to submit answer:', error);
     }
 
-  }, [raceId, currentQuestion, socket, state, dispatch, questionIndex, raceData]);
+  }, [raceId, currentQuestion, socket, state, dispatch]);
 
   return (
     <div style={{ minHeight: '100vh', background: '#0d1117', display: 'flex', flexDirection: 'column' }}>
@@ -172,7 +210,7 @@ export default function RacePage() {
       {/* Lap counter top-left */}
       <div style={{ position: 'absolute', top: 12, left: 16, zIndex: 10, background: 'rgba(0,0,0,0.7)', borderRadius: 8, padding: '4px 14px', border: '1px solid rgba(0,170,255,0.4)' }}>
         <span className="font-racing text-white">
-          Lap {state.playerStats.lap} / {raceData?.settings?.totalLaps || 3}
+          Lap {currentLap} / {raceData?.settings?.totalLaps || 3}
         </span>
       </div>
 
@@ -194,16 +232,20 @@ export default function RacePage() {
 
           {/* Question Panel */}
           <div style={{ flex: 1, overflowY: 'auto' }}>
-            {showQuestion && currentQuestion && (
+            {showQuestion && currentQuestion ? (
               <QuestionPanel
                 question={currentQuestion}
-                questionNumber={questionIndex + 1}
+                questionNumber={lapQIdx + 1}
+                totalQuestions={3}
                 onAnswer={handleAnswer}
               />
-            )}
-            {!showQuestion && (
-              <div style={{ padding: 24, textAlign: 'center', color: '#888' }}>
-                <p className="font-body">Waiting for next question...</p>
+            ) : waitingForNextLap ? (
+              <div style={{ textAlign: 'center', color: '#888', padding: 32 }}>
+                🏁 Lap complete! Waiting for next lap...
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', color: '#888', padding: 32 }}>
+                <p className="font-body">Loading question...</p>
               </div>
             )}
           </div>
