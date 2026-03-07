@@ -6,10 +6,25 @@ module.exports = function(io, socket){
 
   // ✅ FIX 1: joinRace mein username aur raceId store karo
   socket.on('joinRace', ({ raceId, userId, username }) => {
-    if (raceId) socket.join(raceId); // player ko raceId room mein daalo
+    if (raceId) socket.join(raceId);
     playerMeta.set(socket.id, { username, userId, raceId });
     console.log(`Player joined: ${username} | race: ${raceId} | socket: ${socket.id}`);
-  });
+
+    // ✅ YE 3 LINES ADD KAR - naye player ko existing players dikho
+    playerStats.forEach((stats, socketId) => {
+      if (socketId === socket.id) return;
+      const otherMeta = playerMeta.get(socketId) || {};
+      if (otherMeta.raceId !== raceId) return;
+      socket.emit('positionUpdate', {
+        playerId: socketId,
+        username: otherMeta.username || `Player ${socketId.slice(-4)}`,
+        avatar: otherMeta.avatar || "",
+        lap: stats.lap,
+        position: stats.position,
+        speed: stats.speed,
+      });
+    });
+});
 
   socket.on("createRoom", data => {
     const { teamCode, userId, username, avatar } = data;
