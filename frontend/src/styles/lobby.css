@@ -194,6 +194,257 @@
     opacity: 0;
   }
 }
+
+/* ========== F1 CAR RACING ANIMATION WITH FLAMES ========== */
+
+/* Button setup for animation */
+.primary-action {
+  position: relative;
+  overflow: hidden;
+}
+
+/* F1 Car Element */
+.primary-action .f1-car {
+  position: absolute;
+  top: 50%;
+  left: -80px;
+  width: 60px;
+  height: 35px;
+  background: url('https://i.postimg.cc/3xQ0QbXr/f1-car.png') no-repeat center;
+  background-size: contain;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+  filter: drop-shadow(0 0 8px #ff6a00) drop-shadow(0 0 15px #ff4500);
+}
+
+/* Flame Trail - Main Fire */
+.primary-action .f1-car::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 45px;
+  transform: translateY(-50%);
+  width: 120px;
+  height: 25px;
+  background: linear-gradient(
+    to left,
+    #ff6a00 0%,
+    #ff4500 15%,
+    #ff0000 30%,
+    #ff4500 50%,
+    rgba(255, 100, 0, 0.6) 70%,
+    rgba(255, 69, 0, 0.3) 85%,
+    transparent 100%
+  );
+  border-radius: 50% 0 0 50%;
+  filter: blur(3px);
+  animation: flame-flicker 0.1s infinite alternate;
+  z-index: -1;
+}
+
+/* Secondary Flame Layer - Inner Blue/White Hot Core */
+.primary-action .f1-car::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 48px;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 12px;
+  background: linear-gradient(
+    to left,
+    #fff 0%,
+    #ffff00 20%,
+    #ff6a00 50%,
+    rgba(255, 106, 0, 0.5) 80%,
+    transparent 100%
+  );
+  border-radius: 50% 0 0 50%;
+  filter: blur(2px);
+  animation: flame-flicker-fast 0.08s infinite alternate;
+  z-index: -1;
+}
+
+/* Flame Flicker Animations */
+@keyframes flame-flicker {
+  0% {
+    width: 120px;
+    opacity: 0.9;
+    height: 25px;
+  }
+  100% {
+    width: 140px;
+    opacity: 1;
+    height: 28px;
+  }
+}
+
+@keyframes flame-flicker-fast {
+  0% {
+    width: 60px;
+    opacity: 0.8;
+  }
+  100% {
+    width: 75px;
+    opacity: 1;
+  }
+}
+
+/* Trigger animation on button click via .animating class */
+.primary-action.animating .f1-car {
+  opacity: 1;
+  animation: f1-race-across 1.5s ease-in forwards;
+}
+
+/* Main F1 Car Racing Animation */
+@keyframes f1-race-across {
+  0% {
+    left: -80px;
+    transform: translateY(-50%) scaleX(1);
+    opacity: 1;
+  }
+  10% {
+    left: -40px;
+    transform: translateY(-50%) scaleX(1.05);
+  }
+  20% {
+    left: 0%;
+    transform: translateY(-48%) scaleX(1.1);
+  }
+  50% {
+    left: 40%;
+    transform: translateY(-52%) scaleX(1.1);
+  }
+  80% {
+    left: 75%;
+    transform: translateY(-50%) scaleX(1.08);
+    opacity: 1;
+  }
+  100% {
+    left: 110%;
+    transform: translateY(-50%) scaleX(1);
+    opacity: 0;
+  }
+}
+
+/* Speed Lines Effect */
+.primary-action.animating::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 20px,
+    rgba(255, 106, 0, 0.1) 20px,
+    rgba(255, 106, 0, 0.1) 22px
+  );
+  animation: speed-lines 0.3s linear infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@keyframes speed-lines {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-22px);
+  }
+}
+
+/* Button Glow Pulse During Animation */
+.primary-action.animating {
+  animation: button-glow-pulse 0.4s ease-in-out 3;
+  border-color: #ff4500;
+  box-shadow: 
+    0 0 20px rgba(255, 106, 0, 0.6),
+    0 0 40px rgba(255, 69, 0, 0.4),
+    inset 0 0 20px rgba(255, 106, 0, 0.1);
+}
+
+@keyframes button-glow-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 20px rgba(255, 106, 0, 0.6),
+      0 0 40px rgba(255, 69, 0, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 0 35px rgba(255, 106, 0, 0.9),
+      0 0 60px rgba(255, 69, 0, 0.7),
+      0 0 80px rgba(255, 0, 0, 0.3);
+  }
+}
+
+/* Heat Wave Distortion Effect on Button Text */
+.primary-action.animating {
+  color: #fff;
+  text-shadow: 
+    0 0 10px #ff6a00,
+    0 0 20px #ff4500,
+    0 0 30px #ff0000;
+}
+
+/* Spark Particles */
+.primary-action .f1-car .spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #ffff00;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #ff6a00, 0 0 10px #ffff00;
+}
+
+/* Motion Blur on the Car */
+.primary-action.animating .f1-car {
+  filter: 
+    drop-shadow(0 0 8px #ff6a00) 
+    drop-shadow(0 0 15px #ff4500)
+    drop-shadow(-5px 0 3px rgba(255, 106, 0, 0.8))
+    drop-shadow(-10px 0 5px rgba(255, 69, 0, 0.5))
+    drop-shadow(-15px 0 8px rgba(255, 0, 0, 0.3));
+}
+
+/* Smoke Trail Effect */
+.primary-action.animating::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  transform: translateY(-50%);
+  background: linear-gradient(
+    to right,
+    rgba(100, 100, 100, 0.3) 0%,
+    rgba(80, 80, 80, 0.2) 30%,
+    transparent 60%
+  );
+  animation: smoke-dissipate 1.5s ease-out forwards;
+  pointer-events: none;
+  z-index: 4;
+  filter: blur(8px);
+}
+
+@keyframes smoke-dissipate {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-100%);
+  }
+  20% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50%) translateX(100%);
+  }
+}
 /* Grey Buttons */
 /* .neutral-action {
   border-color: #555;
