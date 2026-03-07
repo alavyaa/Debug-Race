@@ -65,6 +65,7 @@ export default function RacePage() {
     };
 
     fetchRace();
+  }, [raceId]);
 
   // Emit joinRace when socket is ready so server can map socket.id -> username
   useEffect(() => {
