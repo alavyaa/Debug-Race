@@ -10,28 +10,31 @@ const Lobby = () => {
   const f1CarRef = useRef(null); // Ref for F1 animation overlay
 
   const handleCreate = async () => {
-    // Show animation first
-    if (f1CarRef.current) {
-      f1CarRef.current.style.display = "block";
-      f1CarRef.current.classList.remove("f1-animation-overlay"); // reset animation
-      void f1CarRef.current.offsetWidth; // trigger reflow
-      f1CarRef.current.classList.add("f1-animation-overlay");
+  // Get the button element and add animating class
+  const button = document.querySelector('.primary-action');
+  if (button) {
+    button.classList.add('animating');
+  }
+
+  // Wait for animation to finish (1.5s)
+  setTimeout(async () => {
+    // Remove animation class
+    if (button) {
+      button.classList.remove('animating');
     }
 
-    // Wait for animation to finish (1.8s)
-    setTimeout(async () => {
-      try {
-        const res = await api.post("/lobby", {
-          name: "Debug Race"
-        });
+    try {
+      const res = await api.post("/lobby", {
+        name: "Debug Race"
+      });
 
-        const code = res.data.lobby.code;
-        navigate(`/room/${code}`);
-      } catch (error) {
-        console.error("Failed to create lobby", error);
-      }
-    }, 1800); // match CSS animation duration
-  };
+      const code = res.data.lobby.code;
+      navigate(`/room/${code}`);
+    } catch (error) {
+      console.error("Failed to create lobby", error);
+    }
+  }, 1500);
+};
 
   const handleJoin = async () => {
     const code = prompt("Enter Room Code");
