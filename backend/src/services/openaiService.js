@@ -1,4 +1,4 @@
-const OpenAI = require("openai");
+
 
 /**
  * OpenRouter configuration
