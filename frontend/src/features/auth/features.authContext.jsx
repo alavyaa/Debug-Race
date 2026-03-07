@@ -14,27 +14,26 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-
-      // CHECK TOKEN BEFORE CALLING PROFILE
       const token = localStorage.getItem("debugrace_token");
       console.log("TOKEN FOUND:", token);
-
       if (!token) {
         setUser(null);
         setLoading(false);
         return;
       }
-
       const res = await getCurrentUser();
-
       console.log("PROFILE RESPONSE:", res.data);
+      const userData = res.data.user || res.data;
+      setUser(userData);
 
-      // if backend sends { user: {...} }
-      setUser(res.data.user || res.data);
+      // ✅ FIX: GameContext ke liye bhi save karo
+      localStorage.setItem("debugrace_user", JSON.stringify(userData));
+      console.log("✅ User saved to localStorage:", userData?.username);
 
     } catch (err) {
       console.log("PROFILE ERROR:", err);
       setUser(null);
+      localStorage.removeItem("debugrace_user");
     } finally {
       setLoading(false);
     }
@@ -46,33 +45,25 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (data) => {
     const res = await registerUser(data);
-
-    // SAVE TOKEN
     if (res?.data?.token) {
       localStorage.setItem("debugrace_token", res.data.token);
     }
-
     await fetchUser();
   };
 
   const login = async (data) => {
     const res = await loginUser(data);
-
-    // SAVE TOKEN
     if (res?.data?.token) {
       localStorage.setItem("debugrace_token", res.data.token);
       console.log("TOKEN SAVED:", res.data.token);
     }
-
     await fetchUser();
   };
 
   const logout = async () => {
     await logoutUser();
-
-    // REMOVE TOKEN
     localStorage.removeItem("debugrace_token");
-
+    localStorage.removeItem("debugrace_user"); // ✅ logout pe clear karo
     setUser(null);
   };
 
@@ -82,9 +73,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, loading, register, login, logout, profile }}
-    >
+    <AuthContext.Provider value={{ user, loading, register, login, logout, profile }}>
       {children}
     </AuthContext.Provider>
   );
