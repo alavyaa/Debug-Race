@@ -99,10 +99,11 @@ export default function RacePage() {
       existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
 
     const displayName =
-         username ||                          // Server se jo aaya woh pehle lo
-         existing?.username ||                // Phir existing
-         (playerId === socket.id ? state.user?.username : null) ||  // Sirf apna
-         `Player ${playerId?.slice(-4)}`;
+       username ||             // ✅ server se aaya naam PEHLE
+       (playerId === socket.id ? state.user?.username : null) ||
+       existing?.username ||
+       `Player ${playerId?.slice(-4)}`;
+
     const updated = prev.filter(p => p.playerId !== playerId);
 
     updated.push({
