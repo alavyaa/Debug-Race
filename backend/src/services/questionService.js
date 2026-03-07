@@ -15,15 +15,6 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
   for (let lap = 1; lap <= totalLaps; lap++) {
     for (let q = 0; q < questionsPerLap; q++) {
       const questionType = lap === 1 ? 'MCQ' : (q === 0 ? 'MCQ' : 'DEBUG');
-      try {
-        const questionData = await generateQuestion({ language, difficulty: level, type: questionType });
-        const question = await Question.create({ ...questionData, language, difficulty: level, type: questionType, isAIGenerated: true });
-        questions.push({ question: question._id, lap, type: questionType });
-      } catch (err) {
-        console.error(`Q gen failed lap=${lap} q=${q}:`, err.message);
-      }
-    }
-  }
   return questions;
 };
 

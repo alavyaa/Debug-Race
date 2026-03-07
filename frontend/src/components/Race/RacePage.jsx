@@ -57,9 +57,6 @@ export default function RacePage() {
           setShowQuestion(true);
         }
 
-        setPositions([]);
-
-        socket?.emit('joinRace', { raceId, userId: state.user?._id, username: state.user?.username || 'You' });
 
       } catch (error) {
         console.error('Failed to fetch race:', error);
@@ -68,7 +65,6 @@ export default function RacePage() {
     };
 
     fetchRace();
-  }, [raceId, dispatch, navigate, socket]);
 
   // Socket event listeners
   useEffect(() => {
@@ -91,7 +87,6 @@ export default function RacePage() {
         const displayName = existing?.username || username || `Player ${playerId?.slice(-4)}`;
         const updated = prev.filter(p => p.playerId !== playerId);
         updated.push({ playerId, position, lap, speed, color, username: displayName });
-        return updated.sort((a, b) => a.lap !== b.lap ? b.lap - a.lap : b.position - a.position);
       });
     });
 
