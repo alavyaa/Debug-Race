@@ -33,4 +33,9 @@ router.patch("/:code/ready",authenticateUser,lobbyController.toggleReadyControll
  * - To start the game
  */
 router.post("/:code/start", authenticateUser, lobbyController.startRaceController);
+/**
+ * - PATCH api/lobby/:code/settings
+ * - Update race settings (leader only)
+ */
+router.patch("/:code/settings", authenticateUser, lobbyController.updateSettingsController);
 module.exports = router;
