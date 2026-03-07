@@ -417,8 +417,8 @@
   position: absolute;
   top: 50%;
   left: -80px;
-  width: 70px;
-  height: 45px;
+  width: 85px;
+  height: 60px;
   background: url('../assets/f1-car.png') no-repeat center;
   background-size: contain;
   transform: translateY(-50%);
