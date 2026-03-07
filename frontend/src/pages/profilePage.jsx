@@ -50,21 +50,21 @@ const Profile = () => {
         >
 
           {/* Avatar */}
-          <div style={{ textAlign: "center" }}>
-            <img
-              src={
-                user?.avatar ||
-                "https://ui-avatars.com/api/?name=" + user?.username
-              }
-              alt="avatar"
-              style={{
-                width: "100px",
-                height: "100px",
-                borderRadius: "50%",
-                border: "2px solid #ffd700"
-              }}
-            />
-          </div>
+         <div style={{ textAlign: "center" }}>
+  <img
+    src={
+      user?.avatar ||
+      `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.username}`
+    }
+    alt="avatar"
+    style={{
+      width: "100px",
+      height: "100px",
+      borderRadius: "50%",
+      border: "2px solid #ffd700"
+    }}
+  />
+</div>
 
           {/* Name */}
           <div>
