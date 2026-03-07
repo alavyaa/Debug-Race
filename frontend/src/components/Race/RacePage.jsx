@@ -69,13 +69,13 @@ export default function RacePage() {
 
   // Emit joinRace when socket is ready so server can map socket.id -> username
   useEffect(() => {
-    if (!socket || !raceId) return;
+    if (!socket || !raceId || !state.user?.username) return; // username check add kiya
     socket.emit('joinRace', {
       raceId,
       userId: state.user?._id,
       username: state.user?.username,
     });
-  }, [socket, raceId, state.user?._id, state.user?.username]);
+}, [socket, raceId, state.user?._id, state.user?.username]);
 
   // Socket event listeners
   useEffect(() => {
