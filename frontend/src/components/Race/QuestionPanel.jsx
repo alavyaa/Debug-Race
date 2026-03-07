@@ -6,6 +6,8 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [result, setResult] = useState(null);
 
+  }));
+
   // Refs to avoid stale closures
   const isSubmittedRef = useRef(false);
   const selectedAnswerRef = useRef(null);
@@ -89,20 +91,10 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
     return '#ff4444';
   };
 
-  // Normalize options to always be { id, text } objects regardless of how they're stored
-  const options = question?.options?.map((opt, i) => ({
-    id: typeof opt === 'object' ? opt.id : String.fromCharCode(65 + i),
-    text: typeof opt === 'object' ? opt.text : opt,
-  })) || [];
-
   const getOptionStyle = (optId) => {
-    if (isSubmitted && result) {
-      if (optId === result.correctAnswer) return 'border-2 border-neon-green bg-neon-green/20 text-neon-green';
-      if (optId === selectedAnswer && !result.isCorrect) return 'border-2 border-red-500 bg-red-500/20 text-red-400';
-      return 'border-2 border-gray-600 text-gray-400';
     }
-    if (selectedAnswer === optId) return 'border-2 border-neon-blue bg-neon-blue/20 text-white';
-    return 'border-2 border-gray-600 hover:border-neon-blue/50 text-gray-300';
+    if (selectedAnswer === optId) return base + 'border-blue-400 bg-blue-400/20 text-white';
+    return base + 'border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-400 cursor-pointer';
   };
 
   return (
@@ -163,7 +155,7 @@ export default function QuestionPanel({ question, questionNumber, totalQuestions
             key={opt.id}
             onClick={() => !isSubmitted && setSelectedAnswer(opt.id)}
             disabled={isSubmitted}
-            className={`w-full p-4 rounded-lg text-left transition-all ${getOptionStyle(opt.id)}`}
+            className={getOptionStyle(opt.id)}
           >
             <span className="font-racing mr-3">{opt.id}.</span>
             <span className="font-body">{opt.text}</span>

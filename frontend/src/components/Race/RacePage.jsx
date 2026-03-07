@@ -57,18 +57,6 @@ export default function RacePage() {
           setShowQuestion(true);
         }
 
-        // Build initial positions — race populates players[].user as { _id, username, avatar }
-        if (raceResp.players?.length > 0) {
-          const initialPositions = raceResp.players.map((p, idx) => ({
-            playerId: p.user?._id?.toString() || p._id?.toString(),
-            username: p.user?.username || `Player ${idx + 1}`,
-            position: 0,
-            lap: 1,
-            speed: 0,
-            color: PLAYER_COLORS[idx % PLAYER_COLORS.length],
-          }));
-          setPositions(initialPositions);
-        }
 
       } catch (error) {
         console.error('Failed to fetch race:', error);
@@ -77,7 +65,6 @@ export default function RacePage() {
     };
 
     fetchRace();
-  }, [raceId, dispatch, navigate]);
 
   // Emit joinRace when socket is ready so server can map socket.id -> username
   useEffect(() => {
@@ -107,19 +94,9 @@ export default function RacePage() {
       setPositions(prev => {
         const existing = prev.find(p => p.playerId === playerId);
         const color = existing?.color || PLAYER_COLORS[prev.length % PLAYER_COLORS.length];
-        const displayName = existing?.username || username ||
-          raceDataRef.current?.players?.find(p =>
-            (p.user?._id || p.user)?.toString() === playerId
-          )?.user?.username ||
-          `Player ${playerId?.slice(-4)}`;
-
+        const displayName = existing?.username || username || `Player ${playerId?.slice(-4)}`;
         const updated = prev.filter(p => p.playerId !== playerId);
         updated.push({ playerId, position, lap, speed, color, username: displayName });
-
-        return updated.sort((a, b) => {
-          if (a.lap !== b.lap) return b.lap - a.lap;
-          return b.position - a.position;
-        });
       });
     });
 

@@ -11,62 +11,10 @@ const { generateQuestion } = require('./openaiService');
 const generateQuestionsForRace = async (language, level, totalLaps) => {
   const questions = [];
   const questionsPerLap = 2;
-  
-  console.log(`📚 Generating ${totalLaps * questionsPerLap} questions for ${language} (Level ${level})`);
-  
+
   for (let lap = 1; lap <= totalLaps; lap++) {
     for (let q = 0; q < questionsPerLap; q++) {
-      // Lap 1: MCQ only
-      // Lap 2+: First question MCQ, second question DEBUG
       const questionType = lap === 1 ? 'MCQ' : (q === 0 ? 'MCQ' : 'DEBUG');
-      
-      console.log(`  Generating Lap ${lap}, Question ${q + 1} (${questionType})`);
-      
-      try {
-        console.log(`    🤖 Generating new AI question...`);
-        
-        const questionData = await generateQuestion({
-          language,
-          difficulty: level,
-          type: questionType
-        });
-        
-        const question = await Question.create({
-          ...questionData,
-          language,
-          difficulty: level,
-          type: questionType,
-          isAIGenerated: true
-        });
-        
-        console.log(`    ✅ New question created`);
-        questions.push(question);
-        
-      } catch (error) {
-        console.error(`    ❌ Error generating question:`, error.message);
-        // Attempt fallback so the race still has the expected number of questions
-        try {
-          const fallbackData = await generateQuestion({
-            language,
-            difficulty: level,
-            type: questionType
-          });
-          const fallbackQuestion = await Question.create({
-            ...fallbackData,
-            language,
-            difficulty: level,
-            type: questionType,
-            isAIGenerated: false
-          });
-          questions.push(fallbackQuestion);
-        } catch (fallbackErr) {
-          console.error(`    ❌ Fallback also failed:`, fallbackErr.message);
-        }
-      }
-    }
-  }
-  
-  console.log(`✅ Generated ${questions.length} questions`);
   return questions;
 };
 

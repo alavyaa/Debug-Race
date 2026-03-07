@@ -227,11 +227,7 @@ async function startRaceController(req, res) {
         submissions: 0,
         score: 0,
       })),
-      questions: generatedQuestions.map((q, idx) => ({
-        question: q._id,
-        lap: Math.floor(idx / 2) + 1,
-        type: idx % 2 === 0 ? "MCQ" : "DEBUG",
-      })),
+      questions: generatedQuestions,
       settings: { language: lobby.settings.language, level: lobby.settings.level, totalLaps },
       startTime: new Date(),
       status: "ongoing",

@@ -1,14 +1,8 @@
 const rooms = new Map();
 const playerStats = new Map(); // socket.id -> { speed, position, lap, streak }
-const playerMeta = new Map(); // socket.id -> { userId, username, raceId }
-
 module.exports = function(io, socket){
 
   socket.on('joinRace', ({ raceId, userId, username }) => {
-    if (raceId && username) {
-      playerMeta.set(socket.id, { userId, username, raceId });
-      socket.join(raceId);
-    }
   });
 
   socket.on("createRoom", data => {
