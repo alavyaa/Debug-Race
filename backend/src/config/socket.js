@@ -5,7 +5,14 @@ let io;
 
 function initSocket(server){
   io = new Server(server,{
-    cors:{ origin:"*", methods:["GET","POST"], credentials:true }
+    cors:{
+      origin:[
+        "https://debug-race-ztam.onrender.com",
+        "http://localhost:5173"
+      ],
+      methods:["GET","POST"],
+      credentials:true
+    }
   });
 
   io.on("connection",(socket)=>{
