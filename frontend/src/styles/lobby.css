@@ -1,14 +1,15 @@
 /* Background */
+/* Background */
 .home-container {
   min-height: 100vh;
-  background: #050505;
-  background-image: repeating-linear-gradient(
-    -45deg,
-    rgba(255, 165, 0, 0.03) 0px,
-    rgba(255, 165, 0, 0.03) 2px,
-    transparent 2px,
-    transparent 20px
-  );
+  /* Dark Overlay + eSports Background Photo */
+  background: 
+    linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+    url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  
   display: flex;
   flex-direction: column;
   align-items: center;
