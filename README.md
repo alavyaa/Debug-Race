@@ -1,4 +1,4 @@
-# 🏎 DEBUG RACE
+# DEBUG RACE
 
 > **Decode • Optimize • Accelerate**
 
@@ -12,7 +12,7 @@
 
 ---
 
-# 🚀 Project Overview
+# Project Overview
 
 **DEBUG RACE** is a **real-time multiplayer coding racing game** where players compete on a racing track by solving coding problems.
 
@@ -20,22 +20,22 @@ Instead of traditional coding contests, DEBUG RACE transforms **debugging and pr
 
 Players accelerate their cars by solving coding challenges.
 
-✔ Correct answer → **Speed Boost**  
-❌ Wrong answer → **Speed Drop**
+Correct answer → **Speed Boost**  
+Wrong answer → **Speed Drop**
 
 The project combines:
 
-- 🏎 Real-time multiplayer racing
-- 🧠 Coding challenges
-- 🤖 AI powered question generation
-- 🎮 Esports-style UI
-- ⚡ Competitive gameplay
+-  Real-time multiplayer racing
+-  Coding challenges
+-  AI powered question generation
+-  Esports-style UI
+-  Competitive gameplay
 
 ---
 
-# 🎮 Core Features
+#  Core Features
 
-## 🏎 Real-Time Multiplayer Racing
+##  Real-Time Multiplayer Racing
 
 Players compete simultaneously in live coding races.
 
@@ -43,7 +43,7 @@ Speed depends on **accuracy and response time**.
 
 ---
 
-## 🤖 AI Question Engine
+##  AI Question Engine
 
 An AI engine dynamically generates coding questions.
 
@@ -51,7 +51,7 @@ Questions adapt based on player performance.
 
 ---
 
-## 🧠 Adaptive Difficulty
+##  Adaptive Difficulty
 
 Difficulty adjusts automatically.
 
@@ -62,7 +62,7 @@ Difficulty adjusts automatically.
 
 ---
 
-## ⚡ Power-Up System
+## Power-Up System
 
 Players earn power-ups through correct answer streaks.
 
@@ -74,20 +74,20 @@ Players earn power-ups through correct answer streaks.
 
 ---
 
-## 🏁 Esports Style Interface
+##  Esports Style Interface
 
 The interface includes:
 
-- 🏆 Leaderboards
-- 🚗 Player avatars
-- ⚡ Live speed indicators
-- 🏁 Race podium results
+-  Leaderboards
+-  Player avatars
+-  Live speed indicators
+-  Race podium results
 
 ---
 
-# 🏎 Game Flow
+#  Game Flow
 
-## 1️⃣ Loader Page — Ignition Mode
+##  Loader Page — Ignition Mode
 
 Dark racing themed loading screen.
 
@@ -95,20 +95,20 @@ Press **ENTER** to start.
 
 ---
 
-## 2️⃣ Home Page — Control Center
+##  Home Page — Control Center
 
 Players can:
 
-- 🚀 Create Team
-- 🔑 Join Team
-- 🏆 Leaderboard
-- 📊 Stats
+-  Create Team
+-  Join Team
+-  Leaderboard
+-  Stats
 
 Example Team Code:
 
 ---
 
-## 3️⃣ Lobby — Pre-Race Arena
+##  Lobby — Pre-Race Arena
 
 Lobby displays:
 
@@ -122,7 +122,7 @@ Leader can start the race when everyone is ready.
 
 ---
 
-# 🏆 Level System
+#  Level System
 
 | Level | Name | Difficulty | Laps |
 |------|------|------|------|
@@ -134,7 +134,7 @@ Leader can start the race when everyone is ready.
 
 ---
 
-# 🗺 Track Themes
+#  Track Themes
 
 Each level has a unique racing track.
 
@@ -149,7 +149,7 @@ Each level has a unique racing track.
 ---
 
 
-# 💻 Supported Languages
+#  Supported Languages
 
 - C
 - Python
@@ -159,7 +159,7 @@ Each team selects one language for the entire race.
 
 ---
 
-# 🖥 Race Interface
+#  Race Interface
 
 ### Track Area
 
@@ -191,7 +191,7 @@ Shows:
 
 ---
 
-# 🏁 Race Results
+# Race Results
 
 After the race:
 
@@ -208,7 +208,7 @@ Statistics include:
 
 ---
 
-# 📊 Performance Analysis
+#  Performance Analysis
 
 Players receive insights such as:
 
@@ -238,7 +238,7 @@ Weak topics detection:
 
 ---
 
-# 🏗 Tech Stack
+# Tech Stack
 
 ## Frontend
 
@@ -266,11 +266,11 @@ Weak topics detection:
 
 ---
 
-# 🏗 Architecture
+#  Architecture
 
 ---
 
-# 🚀 Deployment
+#  Deployment
 
 ### One Click Deploy
 
@@ -331,7 +331,7 @@ Deploy instantly on Railway.
 
 ---
 
-# 🚀 Future Improvements
+#  Future Improvements
 
 - Spectator mode
 - Ranked matchmaking
@@ -339,7 +339,7 @@ Deploy instantly on Railway.
 - Replay system
 - AI coaching assistant
 - Full 3D racing engine
-# 🚗 Car Types
+#  Car Types
 
 | Car | Ability |
 |------|------|
@@ -349,7 +349,7 @@ Deploy instantly on Railway.
 
 ---
 
-# 🧑‍✈️ Driver Avatars
+#  Driver Avatars
 
 Players can choose avatars such as:
 
