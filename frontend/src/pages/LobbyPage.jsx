@@ -1,42 +1,49 @@
 import { useAuth } from "../features/auth/features.authContext";
 import api from "../services/api.service";
 import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
 import "../styles/lobby.css";
-
 
 const Lobby = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const f1CarRef = useRef(null); // Ref for F1 animation overlay
 
   const handleCreate = async () => {
-  try {
-    const res = await api.post("/lobby", {
-      name: "Debug Race"
-    });
+    // Show animation first
+    if (f1CarRef.current) {
+      f1CarRef.current.style.display = "block";
+      f1CarRef.current.classList.remove("f1-animation-overlay"); // reset animation
+      void f1CarRef.current.offsetWidth; // trigger reflow
+      f1CarRef.current.classList.add("f1-animation-overlay");
+    }
 
-    const code = res.data.lobby.code;
+    // Wait for animation to finish (1.8s)
+    setTimeout(async () => {
+      try {
+        const res = await api.post("/lobby", {
+          name: "Debug Race"
+        });
 
-    navigate(`/room/${code}`);
-
-  } catch (error) {
-    console.error("Failed to create lobby", error);
-  }
-};
+        const code = res.data.lobby.code;
+        navigate(`/room/${code}`);
+      } catch (error) {
+        console.error("Failed to create lobby", error);
+      }
+    }, 1800); // match CSS animation duration
+  };
 
   const handleJoin = async () => {
-  const code = prompt("Enter Room Code");
+    const code = prompt("Enter Room Code");
+    if (!code) return;
 
-  if (!code) return;
-
-  try {
-    await api.post("/lobby/join", { code });
-
-    navigate(`/room/${code.toUpperCase()}`);
-
-  } catch (err) {
-    alert("Lobby not found");
-  }
-};
+    try {
+      await api.post("/lobby/join", { code });
+      navigate(`/room/${code.toUpperCase()}`);
+    } catch (err) {
+      alert("Lobby not found");
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -48,21 +55,16 @@ const Lobby = () => {
       {/* Top Navigation */}
       <div className="top-bar">
         <div className="logo">DEBUG RACE</div>
-
         <div className="top-icons">
           <button className="icon-btn" onClick={() => navigate("/profile")}>
             <i className="fa-regular fa-user"></i>
           </button>
-          {/* <button className="icon-btn" onClick={handleLogout}>
-            <i className="fa-solid fa-gear"></i>
-          </button> */}
         </div>
       </div>
 
       {/* Main Center Content */}
       <div className="hero-section">
         <h1 className="main-title">DEBUG RACE</h1>
-
         <p className="subtitle">MULTIPLAYER COMPETITIVE DEBUGGING ARENA</p>
 
         <div className="button-group">
@@ -73,9 +75,15 @@ const Lobby = () => {
           <button className="secondary-action" onClick={handleJoin}>
             JOIN LOBBY
           </button>
-
         </div>
       </div>
+
+      {/* F1 Car Animation Overlay */}
+      <div
+        ref={f1CarRef}
+        className="f1-animation-overlay"
+        style={{ display: "none" }}
+      ></div>
     </div>
   );
 };
