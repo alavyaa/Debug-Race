@@ -149,9 +149,9 @@ async function toggleReadyController(req, res) {
     if (!lobby) {
       return res.status(404).json({ message: "Lobby not found" });
     }
-    if (lobby.status !== "waiting") {
+    if (lobby.status !== "waiting" && lobby.status !== "ready") {
       return res.status(400).json({
-        message: "Cannot change ready status after race starts",
+        message: "Cannot change ready status after race has started",
       });
     }
     const member = lobby.members.find(

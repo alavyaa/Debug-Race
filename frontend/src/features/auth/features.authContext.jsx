@@ -45,7 +45,13 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const register = async (data) => {
-    await registerUser(data);
+    const res = await registerUser(data);
+
+    // SAVE TOKEN
+    if (res?.data?.token) {
+      localStorage.setItem("debugrace_token", res.data.token);
+    }
+
     await fetchUser();
   };
 

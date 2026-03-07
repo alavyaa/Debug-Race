@@ -29,8 +29,8 @@ async function registerController(req, res) {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -70,8 +70,8 @@ async function loginController(req, res) {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -89,7 +89,7 @@ async function loginController(req, res) {
 // Logout
 async function logOutController(req,res){
   try {
-    res.cookie("token", "", { maxAge: 0, httpOnly: true }); 
+    res.cookie("token", "", { maxAge: 0, httpOnly: true, secure: true, sameSite: "none" });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });

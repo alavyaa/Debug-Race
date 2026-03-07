@@ -479,13 +479,15 @@ const Loader = ({ /* onLoadingComplete */ }) => { // Removed onLoadingComplete a
         }
         @font-face {
         font-family: 'Rush Driver';
-        src: url('./assets/fonts/RushDriver-Italic.otf') format('opentype');
+        src: local('Rush Driver'),
+             url('/assets/fonts/RushDriver-Italic.otf') format('opentype');
         font-weight: normal;
         font-style: normal;
+        font-display: swap;
         }
 
         .logo {
-          font-family: 'Rush Driver';
+          font-family: 'Rush Driver', 'Orbitron', sans-serif;
           font-size: 2.2rem;
           font-weight: 900;
           margin: 0;
