@@ -30,7 +30,8 @@ const Lobby = () => {
 
   // --- Derived State & UI Logic ---
   // CALCULATE THESE *BEFORE* YOUR USECALLBACKS THAT DEPEND ON THEM
-  const allPlayersReady = playersInLobby.length > 0 && playersInLobby.every(p => p.isReady);
+  const isSolo = playersInLobby.length === 1;
+  const allPlayersReady = isSolo || (playersInLobby.length > 0 && playersInLobby.every(p => p.isReady));
   const totalPlayers = playersInLobby.length;
   const maxPlayers = lobbyData?.settings?.maxPlayers || 4; // Default max players to 4
   const lobbyLevelInfo = LEVELS[lobbyData?.settings?.level] || LEVELS[1]; // Get detailed level info
@@ -392,14 +393,14 @@ const Lobby = () => {
           <div className="launch-container mt-4">
             <button 
               className={`start-btn ${allPlayersReady && isLeader && totalPlayers > 0 ? 'btn-ready' : 'btn-locked'}`} 
-              disabled={!allPlayersReady || !isLeader || isStartingRace || totalPlayers === 0} 
+              disabled={!isLeader || isStartingRace || totalPlayers === 0 || (!isSolo && !allPlayersReady)} 
               onClick={handleStartRace}
             >
               <div className="btn-content">
                 <span className="btn-icon">{allPlayersReady && isLeader && totalPlayers > 0 ? '🏁' : '🔒'}</span>
                 <span className="btn-text">
                     {isLeader ? (
-                        allPlayersReady && totalPlayers > 0 ? 'START RACE' : `WAITING... (${playersInLobby.filter(p => p.isReady).length}/${totalPlayers})`
+                        isSolo ? 'START SOLO RACE 🏎️' : (allPlayersReady && totalPlayers > 0 ? 'START RACE' : `WAITING... (${playersInLobby.filter(p => p.isReady).length}/${totalPlayers})`)
                     ) : 'WAITING FOR LEADER...'}
                 </span>
               </div>

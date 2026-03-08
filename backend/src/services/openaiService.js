@@ -4,11 +4,8 @@
 
 const OpenAI = require("openai");
 
-/**
- * ⚠️ Replace this with your OpenRouter API key
- */
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: process.env.OPENROUTER_API_KEY || "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",
   baseURL: "https://openrouter.ai/api/v1",
   defaultHeaders: {
     "HTTP-Referer": "https://debug-race-ztam.onrender.com",
@@ -16,9 +13,14 @@ const openai = new OpenAI({
   }
 });
 
-/**
- * Skill focus areas
- */
+// Free models to try in order
+const FREE_MODELS = [
+  "meta-llama/llama-3.1-8b-instruct:free",
+  "mistralai/mistral-7b-instruct:free",
+  "google/gemma-2-9b-it:free",
+  "microsoft/phi-3-mini-128k-instruct:free",
+];
+
 const SKILL_FOCUS = {
   1: ["syntax", "data types", "basic operators", "input/output"],
   2: ["loops", "conditionals", "strings", "arrays"],
@@ -36,134 +38,119 @@ const LEVEL_NAMES = {
 };
 
 /**
- * Generate AI Question
+ * Sleep helper
  */
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
+/**
+ * Try one model
+ */
+const tryModel = async (model, prompt) => {
+  const completion = await openai.chat.completions.create({
+    model,
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.7,
+    max_tokens: 800
+  });
+
+  const content = completion.choices?.[0]?.message?.content;
+  if (!content || content.trim() === "") throw new Error("Empty AI response");
+  return content;
+};
+
+/**
+ * Generate AI Question with fallback models + retry
+ */
 const generateQuestion = async ({ language, difficulty, type, performanceData }) => {
-
   const skills = SKILL_FOCUS[difficulty] || SKILL_FOCUS[1];
   const levelName = LEVEL_NAMES[difficulty] || "Rookie Grid";
 
   let skillFocus;
-
   if (performanceData?.weakTopics?.length) {
     skillFocus = performanceData.weakTopics[0];
   } else {
     skillFocus = skills[Math.floor(Math.random() * skills.length)];
   }
 
-  const systemPrompt = `
-You are a coding question generator for a competitive coding game.
+  const prompt = `You are a coding question generator for a competitive coding game. Return ONLY valid JSON, no explanation, no markdown, no code blocks.
 
-Language: ${language}
-Difficulty: ${difficulty}/5 (${levelName})
-Type: ${type}
-Focus topic: ${skillFocus}
+Generate a ${type} question for ${language} programming, difficulty ${difficulty}/5 (${levelName}), topic: ${skillFocus}.
 
-Return ONLY JSON in this format:
-
+Return EXACTLY this JSON format:
 {
-  "question": "text",
-  "code": "code snippet",
+  "question": "question text here",
+  "code": "code snippet here",
   "topic": "${skillFocus}",
   "options": [
-    {"id":"A","text":"option"},
-    {"id":"B","text":"option"},
-    {"id":"C","text":"option"},
-    {"id":"D","text":"option"}
+    {"id":"A","text":"option 1"},
+    {"id":"B","text":"option 2"},
+    {"id":"C","text":"option 3"},
+    {"id":"D","text":"option 4"}
   ],
   "correctAnswer":"A",
-  "explanation":"text"
-}
-`;
+  "explanation":"explanation here"
+}`;
 
-  try {
+  // Try each model in order
+  for (let modelIndex = 0; modelIndex < FREE_MODELS.length; modelIndex++) {
+    const model = FREE_MODELS[modelIndex];
 
-    console.log(`🤖 Generating ${type} question | ${language} | Level ${difficulty}`);
+    // Retry up to 2 times per model
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        console.log(`🤖 Trying model: ${model} (attempt ${attempt})`);
 
-    const completion = await openai.chat.completions.create({
-      model: "deepseek/deepseek-chat:free",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: "Generate the question." }
-      ],
-      temperature: 0.7,
-      max_tokens: 700
-    });
+        const content = await tryModel(model, prompt);
+        console.log("📥 Raw AI response:", content.substring(0, 200));
 
-    const content = completion.choices?.[0]?.message?.content;
+        let questionData;
+        try {
+          questionData = JSON.parse(content);
+        } catch {
+          const jsonMatch = content.match(/\{[\s\S]*\}/);
+          if (!jsonMatch) throw new Error("Invalid JSON response");
+          questionData = JSON.parse(jsonMatch[0]);
+        }
 
-    if (!content) {
-      throw new Error("Empty AI response");
-    }
+        if (!questionData.question || !questionData.options || !questionData.correctAnswer) {
+          throw new Error("Invalid AI question format");
+        }
 
-    console.log("📥 Raw AI response:", content);
+        questionData.timeLimit = type === "DEBUG" ? 45 : 30;
+        questionData.language = language;
+        questionData.difficulty = difficulty;
+        questionData.type = type;
 
-    let questionData;
+        console.log(`✅ AI Question Generated via ${model}`);
+        return questionData;
 
-    try {
-      questionData = JSON.parse(content);
-    } catch {
+      } catch (error) {
+        console.error(`❌ Model ${model} attempt ${attempt} failed: ${error.message}`);
 
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-
-      if (!jsonMatch) {
-        throw new Error("Invalid JSON response");
+        if (error.message.includes("429") || error.message.includes("rate limit")) {
+          // Rate limited — wait before retry or next model
+          const waitTime = attempt === 1 ? 15000 : 30000;
+          console.log(`⏳ Rate limited. Waiting ${waitTime / 1000}s...`);
+          await sleep(waitTime);
+        } else if (error.message.includes("404")) {
+          // Model not found — skip to next model immediately
+          console.log(`⏭️ Model not available, trying next...`);
+          break;
+        } else {
+          // Other error — short wait then retry
+          if (attempt < 2) await sleep(3000);
+        }
       }
-
-      questionData = JSON.parse(jsonMatch[0]);
     }
 
-    if (
-      !questionData.question ||
-      !questionData.options ||
-      !questionData.correctAnswer
-    ) {
-      throw new Error("Invalid AI question format");
+    // Wait between model switches to avoid hammering
+    if (modelIndex < FREE_MODELS.length - 1) {
+      await sleep(2000);
     }
-
-    questionData.timeLimit = type === "DEBUG" ? 45 : 30;
-    questionData.language = language;
-    questionData.difficulty = difficulty;
-    questionData.type = type;
-
-    console.log("✅ AI Question Generated");
-
-    return questionData;
-
-  } catch (error) {
-
-    console.error("❌ AI generation failed:", error.message);
-
-    return getFallbackQuestion(language, type, difficulty, skillFocus);
   }
-};
 
-
-/**
- * Fallback question
- */
-
-const getFallbackQuestion = (language, type, difficulty, skillFocus) => {
-
-  return {
-    question: "What is the output of this code?",
-    code: "let x = 5;\nconsole.log(x * 2);",
-    topic: skillFocus,
-    options: [
-      { id: "A", text: "10" },
-      { id: "B", text: "5" },
-      { id: "C", text: "25" },
-      { id: "D", text: "Error" }
-    ],
-    correctAnswer: "A",
-    explanation: "5 * 2 = 10",
-    timeLimit: type === "DEBUG" ? 45 : 30,
-    language,
-    difficulty,
-    type,
-    isAIGenerated: false
-  };
+  // All models failed
+  throw new Error("All AI models failed");
 };
 
 module.exports = {

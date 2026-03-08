@@ -241,19 +241,19 @@ async function startRaceController(req, res) {
       });
     }
 
-    if (lobby.members.length < 2) {
-      return res.status(400).json({
-        message: "At least 2 players required",
-      });
-    }
+    // BAAD MEIN (ye lagao):
+const isSolo = lobby.members.length === 1;
 
-    const allReady = lobby.members.every((m) => m.isReady);
+if (!isSolo && lobby.members.length < 2) {
+  return res.status(400).json({ message: "At least 2 players required" });
+}
 
-    if (!allReady) {
-      return res.status(400).json({
-        message: "All players must be ready",
-      });
-    }
+if (!isSolo) {
+  const allReady = lobby.members.every((m) => m.isReady);
+  if (!allReady) {
+    return res.status(400).json({ message: "All players must be ready" });
+  }
+}
 
     const totalLaps = 2;
 

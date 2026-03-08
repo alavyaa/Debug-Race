@@ -8,6 +8,7 @@ function initSocket(server){
     cors:{
       origin:[
         "https://debug-race-ztam.onrender.com",
+        "https://thriller-gpl-busy-masters.trycloudflare.com",
         "http://localhost:5173"
       ],
       methods:["GET","POST"],

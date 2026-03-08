@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
 
     allowedHosts: [
-      "girlfriend-damaged-trying-semi.trycloudflare.com"
+      "thriller-gpl-busy-masters.trycloudflare.com"
     ],
 
     proxy: {
