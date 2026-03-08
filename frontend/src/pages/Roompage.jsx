@@ -277,7 +277,7 @@ const RoomPage = () => {
           TOGGLE READY
         </button>
 
-        {lobby?.status === "ready" && isLeader && (
+        {isLeader && (lobby?.status === "ready" || lobby?.members?.length === 1) && (
           <button
             onClick={startRace}
             disabled={updating}
