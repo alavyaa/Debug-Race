@@ -19,6 +19,11 @@ const normalizeLanguage = (language) => {
 };
 
 /**
+ * Sleep helper
+ */
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/**
  * Get fallback question for specific language and type
  */
 const getFallbackQuestion = (language, type, index = 0) => {
@@ -726,10 +731,8 @@ const getFallbackQuestion = (language, type, index = 0) => {
     },
   };
 
-  // Get questions for the correct language
   const langFallbacks = fallbacks[lang];
   if (!langFallbacks) {
-    console.warn(`⚠️ No fallbacks for "${lang}", using JavaScript`);
     const jsFallbacks = fallbacks.JavaScript;
     const normalizedType = type === "DEBUG" ? "DEBUG" : "MCQ";
     const pool = jsFallbacks[normalizedType];
@@ -754,27 +757,21 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
   const questions = [];
   const questionsPerLap = 2;
   const normalizedLanguage = normalizeLanguage(language);
-
-  // Track used questions to avoid duplicates
   const usedQuestionIds = new Set();
   let fallbackCounter = 0;
 
-  console.log(
-    `📚 Generating ${totalLaps * questionsPerLap} questions for ${normalizedLanguage} (Level ${level})`
-  );
+  console.log(`📚 Generating ${totalLaps * questionsPerLap} questions for ${normalizedLanguage} (Level ${level})`);
 
   for (let lap = 1; lap <= totalLaps; lap++) {
     for (let q = 0; q < questionsPerLap; q++) {
       const questionType = lap === 1 ? "MCQ" : q === 0 ? "MCQ" : "DEBUG";
 
-      console.log(
-        `  Lap ${lap}, Q${q + 1} (${questionType}) for ${normalizedLanguage}`
-      );
+      console.log(`  Lap ${lap}, Q${q + 1} (${questionType}) for ${normalizedLanguage}`);
 
       try {
         let question = null;
 
-        // Step 1: Try to find unused cached question for THIS language
+        // Step 1: Try cached questions
         const cachedQuestions = await Question.find({
           language: normalizedLanguage,
           difficulty: level,
@@ -806,24 +803,21 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
               isAIGenerated: true,
             });
             console.log("✅ AI question created");
+
+            // ✅ Wait between AI calls to avoid rate limiting
+            await sleep(12000);
+
           } catch (aiError) {
             console.error("❌ AI failed:", aiError.message);
             question = null;
           }
         }
 
-        // Step 3: Still no question? Use fallback for CORRECT language
+        // Step 3: Still no question? Use fallback
         if (!question) {
-          const fallbackData = getFallbackQuestion(
-            normalizedLanguage,
-            questionType,
-            fallbackCounter
-          );
+          const fallbackData = getFallbackQuestion(normalizedLanguage, questionType, fallbackCounter);
           fallbackCounter++;
-
-          console.log(
-            `📦 Fallback #${fallbackCounter} for ${normalizedLanguage} ${questionType}`
-          );
+          console.log(`📦 Fallback #${fallbackCounter} for ${normalizedLanguage} ${questionType}`);
 
           try {
             question = await Question.create({
@@ -834,8 +828,6 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
               isAIGenerated: false,
             });
           } catch (dbError) {
-            console.error("❌ DB save failed:", dbError.message);
-            // Use raw object so race can still proceed
             question = {
               _id: `fallback_${normalizedLanguage}_${fallbackCounter}_${Date.now()}`,
               ...fallbackData,
@@ -847,40 +839,26 @@ const generateQuestionsForRace = async (language, level, totalLaps) => {
           }
         }
 
-        // Track used question ID to prevent duplicates
-        if (question._id) {
-          usedQuestionIds.add(question._id.toString());
-        }
-
+        if (question._id) usedQuestionIds.add(question._id.toString());
         questions.push(question);
+
       } catch (error) {
         console.error("❌ Total failure:", error.message);
-
-        // Emergency fallback - still uses correct language
-        const fallbackData = getFallbackQuestion(
-          normalizedLanguage,
-          questionType,
-          fallbackCounter
-        );
+        const fallbackData = getFallbackQuestion(normalizedLanguage, questionType, fallbackCounter);
         fallbackCounter++;
-
-        const emergencyQuestion = {
+        questions.push({
           _id: `emergency_${normalizedLanguage}_${fallbackCounter}_${Date.now()}`,
           ...fallbackData,
           language: normalizedLanguage,
           difficulty: level,
           type: questionType,
           isAIGenerated: false,
-        };
-
-        questions.push(emergencyQuestion);
+        });
       }
     }
   }
 
-  console.log(
-    `✅ Generated ${questions.length} questions for ${normalizedLanguage}`
-  );
+  console.log(`✅ Generated ${questions.length} questions for ${normalizedLanguage}`);
   return questions;
 };
 
@@ -897,68 +875,34 @@ const seedQuestionsWithAI = async () => {
     for (let level = 1; level <= 5; level++) {
       for (const type of types) {
         try {
-          const existingCount = await Question.countDocuments({
-            language,
-            difficulty: level,
-            type,
-          });
+          const existingCount = await Question.countDocuments({ language, difficulty: level, type });
 
           if (existingCount >= 3) {
-            console.log(
-              `✓ ${language} L${level} ${type}: ${existingCount} exist`
-            );
+            console.log(`✓ ${language} L${level} ${type}: ${existingCount} exist`);
             continue;
           }
 
           const needed = 3 - existingCount;
-
           for (let i = 0; i < needed; i++) {
             console.log(`🤖 ${language} L${level} ${type} #${i + 1}...`);
-
             try {
-              const questionData = await generateQuestion({
-                language,
-                difficulty: level,
-                type,
-              });
-
-              await Question.create({
-                ...questionData,
-                language,
-                difficulty: level,
-                type,
-                isAIGenerated: true,
-              });
-
+              const questionData = await generateQuestion({ language, difficulty: level, type });
+              await Question.create({ ...questionData, language, difficulty: level, type, isAIGenerated: true });
               console.log("✅ AI created");
             } catch (aiError) {
               console.warn(`⚠️ AI failed: ${aiError.message}`);
-
               const fallbackData = getFallbackQuestion(language, type, i);
-
-              await Question.create({
-                ...fallbackData,
-                language,
-                difficulty: level,
-                type,
-                isAIGenerated: false,
-              });
-
+              await Question.create({ ...fallbackData, language, difficulty: level, type, isAIGenerated: false });
               console.log(`✅ Fallback created for ${language}`);
             }
-
-            await new Promise((r) => setTimeout(r, 1000));
+            await sleep(12000);
           }
         } catch (error) {
-          console.error(
-            `❌ Seed error ${language} L${level} ${type}:`,
-            error.message
-          );
+          console.error(`❌ Seed error ${language} L${level} ${type}:`, error.message);
         }
       }
     }
   }
-
   console.log("✅ Seeding complete!");
 };
 
@@ -967,51 +911,17 @@ const seedQuestionsWithAI = async () => {
  */
 const getAdaptiveQuestion = async (language, level, type, performanceData) => {
   const normalizedLanguage = normalizeLanguage(language);
-
   try {
-    console.log(
-      `🎯 Adaptive: ${normalizedLanguage} L${level} ${type}`
-    );
-
-    const questionData = await generateQuestion({
-      language: normalizedLanguage,
-      difficulty: level,
-      type,
-      performanceData,
-    });
-
-    const question = await Question.create({
-      ...questionData,
-      language: normalizedLanguage,
-      difficulty: level,
-      type,
-      isAIGenerated: true,
-    });
-
+    const questionData = await generateQuestion({ language: normalizedLanguage, difficulty: level, type, performanceData });
+    const question = await Question.create({ ...questionData, language: normalizedLanguage, difficulty: level, type, isAIGenerated: true });
     return question;
   } catch (error) {
     console.error("❌ Adaptive failed:", error.message);
-
     const fallbackData = getFallbackQuestion(normalizedLanguage, type, 0);
-
     try {
-      const question = await Question.create({
-        ...fallbackData,
-        language: normalizedLanguage,
-        difficulty: level,
-        type,
-        isAIGenerated: false,
-      });
-      return question;
+      return await Question.create({ ...fallbackData, language: normalizedLanguage, difficulty: level, type, isAIGenerated: false });
     } catch (dbError) {
-      return {
-        _id: `adaptive_fallback_${Date.now()}`,
-        ...fallbackData,
-        language: normalizedLanguage,
-        difficulty: level,
-        type,
-        isAIGenerated: false,
-      };
+      return { _id: `adaptive_fallback_${Date.now()}`, ...fallbackData, language: normalizedLanguage, difficulty: level, type, isAIGenerated: false };
     }
   }
 };
