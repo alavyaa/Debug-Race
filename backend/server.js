@@ -14,7 +14,6 @@ const PORT = process.env.PORT || 5000;
   
   // 🧹 Clear ALL questions so AI generates fresh ones
   const Question = require("./src/models/Question");
-  await Question.deleteMany({});
   console.log("🧹 All questions cleared!");
 
   server.listen(PORT, () =>
