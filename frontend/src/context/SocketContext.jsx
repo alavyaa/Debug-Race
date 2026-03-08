@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 
 const SocketContext = createContext();
 
-const SOCKET_URL = "http://localhost:5000"; // Update this to your server URL;
+const SOCKET_URL = "debug-race-production-5710.up.railway.app"; // Update this to your server URL;
 
 export function SocketProvider({ children }) {
   const [socket, setSocket] = useState(null);
