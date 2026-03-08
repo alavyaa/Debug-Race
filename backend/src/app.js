@@ -11,6 +11,7 @@ app.use(cors({
     "https://debug-race-ztam.onrender.com",
     "debug-race-production-5710.up.railway.app",
     "https://thriller-gpl-busy-masters.trycloudflare.com",
+    "https://debug-race-81tm.onrender.com",
     /https:\/\/debug-race.*\.vercel\.app/
   ],
   credentials: true
