@@ -283,17 +283,17 @@ Deploy instantly on Railway.
 <table>
   <tr>
     <td align="center">
-      <a href="https://github.com/ShauryaSingh1709" target="_blank">
+      <a href="" target="_blank">
         <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="60" />
         <br />
-        <sub><b>Shaurya</b></sub>
+        <sub><b></b></sub>
       </a>
     </td>
     <td align="center">
-      <a href="https://github.com/ADiBariya" target="_blank">
+      <a href="" target="_blank">
         <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="60" />
         <br />
-        <sub><b>Aditya</b></sub>
+        <sub><b></b></sub>
       </a>
     </td>
     <td align="center">
