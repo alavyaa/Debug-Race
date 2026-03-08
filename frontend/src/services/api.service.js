@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "debug-race-production-5710.up.railway.app"; // Update this to your server URL
+const API_URL = import.meta.env.VITE_API_URL || "https://debug-race-production-5710.up.railway.app"; // Update this to your server URL must add https://
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
