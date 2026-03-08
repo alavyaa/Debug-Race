@@ -337,25 +337,11 @@ Deploy instantly on Railway.
 - Replay system
 - AI coaching assistant
 - Full 3D racing engine
-#  Car Types
+- Different cars & avatars
 
-| Car | Ability |
-|------|------|
-| Speedster | Balanced |
-| TurboX | High boost |
-| StablePro | Low penalty |
 
 ---
 
-#  Driver Avatars
-
-Players can choose avatars such as:
-
-- Coder Ninja
-- Algorithm Ace
-- Debug Master
-- AI Racer
-- Cyber Mechanic
 
 ---
 ---
