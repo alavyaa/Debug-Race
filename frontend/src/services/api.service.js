@@ -4,7 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL || "https://debug-race-production-5
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
-  timeout: 10000,
+  timeout: 30000,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json"
