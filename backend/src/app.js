@@ -9,6 +9,7 @@ app.use(cors({
   origin: [
     "http://localhost:5173",
     "https://debug-race-ztam.onrender.com",
+    "debug-race-production-5710.up.railway.app",
     "https://thriller-gpl-busy-masters.trycloudflare.com",
     /https:\/\/debug-race.*\.vercel\.app/
   ],
