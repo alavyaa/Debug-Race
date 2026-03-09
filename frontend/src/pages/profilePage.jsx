@@ -14,8 +14,8 @@ const Profile = () => {
 
   // User data from localStorage
   const user = JSON.parse(localStorage.getItem("user")) || {
-    username: "Guest",
-    email: "guest@example.com",
+    username: username,
+    email: email,
   };
 
   const [currentAvatarIndex, setCurrentAvatarIndex] = useState(0);
