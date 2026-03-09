@@ -7,7 +7,7 @@ function initSocket(server){
   io = new Server(server,{
     cors:{
       origin:[
-        "https://debug-race-ztam.onrender.com",
+        "https://debug-racee.onrender.com",
         "https://thriller-gpl-busy-masters.trycloudflare.com",
         "http://localhost:5173"
       ],
