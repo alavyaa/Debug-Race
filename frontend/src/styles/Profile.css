@@ -1,0 +1,431 @@
+/* ================================
+   PROFILE PAGE STYLES
+   Theme: Black + Neon Orange Racing
+   ================================ */
+
+/* Main Container */
+.profile-container {
+  min-height: 100vh;
+  background-color: #0a0a0a;
+  background-image: url('/assets/images/background.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding: 2rem;
+  font-family: 'Orbitron', sans-serif;
+  box-sizing: border-box;
+}
+
+/* ================================
+   HEADER SECTION
+   ================================ */
+
+.profile-header {
+  position: relative;
+  margin-bottom: 3rem;
+  padding-top: 1rem;
+}
+
+.header-titles {
+  text-align: center;
+}
+
+.profile-title {
+  color: #ff6600;
+  font-size: 3rem;
+  text-shadow: 0 0 10px #ff6600, 0 0 20px #ff6600, 0 0 30px #ff6600;
+  margin: 0;
+  letter-spacing: 5px;
+  font-weight: 700;
+}
+
+.profile-subtitle {
+  color: #888;
+  font-size: 1rem;
+  letter-spacing: 3px;
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+}
+
+/* Debug Race Button - Top Left */
+.debug-race-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: transparent;
+  border: 2px solid #ff6600;
+  color: #ff6600;
+  padding: 0.8rem 1.5rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+}
+
+.debug-race-btn:hover {
+  background: #ff6600;
+  color: #000;
+  box-shadow: 0 0 20px #ff6600, 0 0 40px #ff6600;
+}
+
+/* ================================
+   MAIN LAYOUT - TWO COLUMNS
+   ================================ */
+
+.profile-main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.profile-left,
+.profile-right {
+  flex: 1;
+  min-width: 350px;
+  max-width: 500px;
+}
+
+/* ================================
+   PANEL STYLES (Shared)
+   ================================ */
+
+.avatar-panel,
+.info-panel {
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid #ff6600;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 0 30px rgba(255, 102, 0, 0.3), 
+              inset 0 0 20px rgba(255, 102, 0, 0.1);
+}
+
+.panel-title {
+  color: #ff6600;
+  font-size: 1.3rem;
+  text-align: center;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px #ff6600;
+  border-bottom: 1px solid rgba(255, 102, 0, 0.3);
+  padding-bottom: 1rem;
+}
+
+/* ================================
+   LEFT SIDE - AVATAR SELECTOR
+   ================================ */
+
+.avatar-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Arrow Buttons */
+.avatar-arrow {
+  background: transparent;
+  border: 2px solid #ff6600;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.avatar-arrow:hover {
+  background: rgba(255, 102, 0, 0.2);
+  box-shadow: 0 0 15px #ff6600;
+  transform: scale(1.1);
+}
+
+.avatar-arrow:active {
+  transform: scale(0.95);
+}
+
+.arrow-img {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 0 3px #ff6600);
+}
+
+/* Avatar Display Area */
+.avatar-display {
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.avatar-display.avatar-selected .avatar-frame {
+  box-shadow: 0 0 30px #ff6600, 0 0 60px #ff6600, 0 0 90px rgba(255, 102, 0, 0.5);
+}
+
+.avatar-frame {
+  width: 180px;
+  height: 180px;
+  border: 3px solid #ff6600;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto;
+  box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.avatar-frame:hover {
+  box-shadow: 0 0 30px #ff6600, 0 0 50px rgba(255, 102, 0, 0.3);
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.avatar-frame:hover .avatar-image {
+  transform: scale(1.05);
+}
+
+/* Avatar Indicator Dots */
+.avatar-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.indicator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 102, 0, 0.3);
+  border: 1px solid #ff6600;
+  transition: all 0.3s ease;
+}
+
+.indicator-dot.active {
+  background: #ff6600;
+  box-shadow: 0 0 10px #ff6600;
+}
+
+/* Select Button */
+.select-avatar-btn {
+  width: 100%;
+  background: transparent;
+  border: 2px solid #ff6600;
+  color: #ff6600;
+  padding: 1rem 2rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.select-avatar-btn:hover:not(.selected) {
+  background: #ff6600;
+  color: #000;
+  box-shadow: 0 0 20px #ff6600, 0 0 40px rgba(255, 102, 0, 0.5);
+}
+
+.select-avatar-btn:active:not(.selected) {
+  transform: scale(0.98);
+}
+
+/* Selected State */
+.select-avatar-btn.selected {
+  background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+  color: #000;
+  box-shadow: 0 0 30px #ff6600, 0 0 60px rgba(255, 102, 0, 0.5);
+  cursor: default;
+  animation: selectedPulse 2s infinite;
+}
+
+@keyframes selectedPulse {
+  0%, 100% {
+    box-shadow: 0 0 30px #ff6600, 0 0 60px rgba(255, 102, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 40px #ff6600, 0 0 80px rgba(255, 102, 0, 0.7);
+  }
+}
+
+/* ================================
+   RIGHT SIDE - PROFILE INFO
+   ================================ */
+
+.profile-info {
+  margin-bottom: 2rem;
+}
+
+.info-group {
+  margin-bottom: 1.5rem;
+}
+
+.info-label {
+  color: #ff6600;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  display: block;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.info-value {
+  color: #fff;
+  font-size: 1.2rem;
+  margin: 0;
+  padding: 1rem;
+  background: rgba(255, 102, 0, 0.1);
+  border: 1px solid rgba(255, 102, 0, 0.3);
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.info-value:hover {
+  border-color: #ff6600;
+  box-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
+}
+
+/* Logout Button */
+.logout-btn {
+  width: 100%;
+  background: transparent;
+  border: 2px solid #ff6600;
+  color: #ff6600;
+  padding: 1rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #ff6600;
+  color: #000;
+  box-shadow: 0 0 20px #ff6600, 0 0 40px rgba(255, 102, 0, 0.5);
+}
+
+.logout-btn:active {
+  transform: scale(0.98);
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+
+@media (max-width: 900px) {
+  .profile-main {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profile-left,
+  .profile-right {
+    width: 100%;
+    max-width: 450px;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 1rem;
+  }
+
+  .profile-title {
+    font-size: 2rem;
+    letter-spacing: 3px;
+  }
+
+  .profile-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .debug-race-btn {
+    position: relative;
+    display: block;
+    margin: 0 auto 1rem auto;
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  .avatar-frame {
+    width: 140px;
+    height: 140px;
+  }
+
+  .avatar-arrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .arrow-img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .avatar-panel,
+  .info-panel {
+    padding: 1.5rem;
+  }
+
+  .profile-left,
+  .profile-right {
+    min-width: 280px;
+  }
+}
+
+/* ================================
+   ANIMATIONS
+   ================================ */
+
+/* Fade in animation for panels */
+.avatar-panel,
+.info-panel {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.profile-right .info-panel {
+  animation-delay: 0.1s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Avatar transition animation */
+.avatar-image {
+  animation: avatarFadeIn 0.3s ease-out;
+}
+
+@keyframes avatarFadeIn {
+  from {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
