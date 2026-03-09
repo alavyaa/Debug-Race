@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Profile.css";
+import avatar1 from "../assets/images/avatar1.png";
+import avatar2 from "../assets/images/avatar2.png";
+import avatar3 from "../assets/images/avatar3.png";
+import avatar4 from "../assets/images/avatar4.png";
 
 const Profile = () => {
   const navigate = useNavigate();
 
   // Avatar images
-  const avatars = [
-    "frontend/src/assets/images/avatar1.png",
-    "frontend/src/assets/images/avatar2.png",
-    "frontend/src/assets/images/avatar3.png",
-    "frontend/src/assets/images/avatar4.png",
-  ];
+  const avatars = [avatar1, avatar2, avatar3, avatar4];
 
   // User data from localStorage
   const user = JSON.parse(localStorage.getItem("user")) || {
