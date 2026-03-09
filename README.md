@@ -152,6 +152,7 @@ Each level has a unique racing track.
 - C
 - Python
 - Java
+- JavaScript
 
 Each team selects one language for the entire race.
 
