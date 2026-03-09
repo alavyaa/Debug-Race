@@ -5,15 +5,14 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
+/* CORS CONFIG */
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://debug-race-ztam.onrender.com",
-    "debug-race-production-5710.up.railway.app",
-    "https://thriller-gpl-busy-masters.trycloudflare.com",
-    "https://debug-race-81tm.onrender.com",
-    /https:\/\/debug-race.*\.vercel\.app/
+    "https://debug-racee.onrender.com"
   ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
@@ -25,13 +24,13 @@ app.get("/", (req, res) => {
   res.send("Debug Race backend running 🚀");
 });
 
-// routes
+/* ROUTES */
 app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/lobby", require("./routes/lobby.route"));
 app.use("/api/race", require("./routes/race"));
 app.use("/api/ai", require("./routes/ai"));
 
-/* 404 handler */
+/* 404 HANDLER */
 app.use((req, res) => {
   res.status(404).json({
     error: `Cannot ${req.method} ${req.path}`
