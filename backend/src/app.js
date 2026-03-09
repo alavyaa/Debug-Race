@@ -5,21 +5,19 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
-/* CORS CONFIG */
+/* CORS FIX */
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://debug-racee.onrender.com"
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: "https://debug-racee.onrender.com",
   credentials: true
 }));
+
+/* IMPORTANT: allow preflight */
+app.options("*", cors());
 
 app.use(express.json());
 app.use(cookieParser());
 
-/* HEALTH CHECK ROUTE (important for Railway) */
+/* HEALTH CHECK ROUTE */
 app.get("/", (req, res) => {
   res.send("Debug Race backend running 🚀");
 });
