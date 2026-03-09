@@ -1,5 +1,5 @@
 {
-  "$schema": "https://railway.app/railway.schema.json",
+  "$schema": "https://debug-race-production-9f38.up.railway.app",
   "deploy": {
     "startCommand": "node server.js",
     "restartPolicyType": "ON_FAILURE"
