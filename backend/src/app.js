@@ -9,7 +9,7 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://debug-racee.onrender.com"
+    "https://debug-race-ztam.onrender.com"
   ],
   credentials: true
 }));
